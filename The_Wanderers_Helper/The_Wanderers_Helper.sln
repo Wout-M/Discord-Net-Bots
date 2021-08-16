@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31402.337
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "The_Wanderers_Helper", "The_Wanderers_Helper\The_Wanderers_Helper.csproj", "{6ED5AE45-30AB-450A-8D55-A4877F484F0C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6ED5AE45-30AB-450A-8D55-A4877F484F0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ED5AE45-30AB-450A-8D55-A4877F484F0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ED5AE45-30AB-450A-8D55-A4877F484F0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ED5AE45-30AB-450A-8D55-A4877F484F0C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {34063BFD-76F8-4FAC-AD3D-7B2353A6E140}
+	EndGlobalSection
+EndGlobal
