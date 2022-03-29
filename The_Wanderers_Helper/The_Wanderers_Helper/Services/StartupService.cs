@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using System;
 using System.Reflection;
@@ -13,20 +13,20 @@ namespace The_Wanderers_Helper.Services
         private readonly DiscordSocketClient _client;
         private readonly ConfigService _configService;
         private readonly EventService _eventService;
-        private readonly CommandService _commands;
+        private readonly InteractionService _interactions;
 
         public StartupService(
             IServiceProvider provider,
             DiscordSocketClient client,
             ConfigService configService,
             EventService eventService,
-            CommandService commands)
+            InteractionService interactions)
         {
             _provider = provider;
             _client = client;
             _configService = configService;
             _eventService = eventService;
-            _commands = commands;
+            _interactions = interactions;
         }
 
         public async Task StartAsync()
@@ -37,7 +37,7 @@ namespace The_Wanderers_Helper.Services
             await _client.LoginAsync(TokenType.Bot, discordToken);
             await _client.StartAsync();
 
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
+            await _interactions.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
         }
     }
 }

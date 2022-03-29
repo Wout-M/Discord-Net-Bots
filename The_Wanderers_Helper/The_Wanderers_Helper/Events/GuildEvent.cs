@@ -29,6 +29,8 @@ namespace The_Wanderers_Helper.Events
                 };
                 await _configService.AddOrUpdateServerConfig(guild.Id, serverConfig);
             }
+
+            Console.WriteLine($"Joined {guild.Name} at {DateTime.Now}");
         }
     }
 }

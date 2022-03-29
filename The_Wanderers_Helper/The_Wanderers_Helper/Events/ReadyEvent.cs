@@ -1,5 +1,8 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.Interactions;
+using Discord.WebSocket;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using The_Wanderers_Helper.Services;
 
@@ -7,11 +10,13 @@ namespace The_Wanderers_Helper.Events
 {
     public class ReadyEvent
     {
+        private readonly IServiceProvider _provider;
         private readonly DiscordSocketClient _client;
         private readonly ConfigService _configService;
 
-        public ReadyEvent(DiscordSocketClient client, ConfigService configService)
+        public ReadyEvent(IServiceProvider provider, DiscordSocketClient client, ConfigService configService)
         {
+            _provider = provider;
             _client = client;
             _configService = configService;
         }
@@ -19,13 +24,22 @@ namespace The_Wanderers_Helper.Events
 
         public async Task Ready()
         {
-            await _client.SetGameAsync("to see if everyone behaves", type: Discord.ActivityType.Watching);
-            await _client.SetStatusAsync(Discord.UserStatus.DoNotDisturb);
+            await _client.SetGameAsync("to see if everyone behaves", type: ActivityType.Watching);
+            await _client.SetStatusAsync(UserStatus.DoNotDisturb);
+
+            var interactions = new InteractionService(_client, new InteractionServiceConfig()
+            {
+                LogLevel = LogSeverity.Info,
+                DefaultRunMode = RunMode.Async
+            });
+            await interactions.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
 
             var config = await _configService.GetConfig();
 
-            foreach (var server in config.Servers.Values)
+            foreach (var serverConfig in config.Servers)
             {
+                var server = serverConfig.Value;
+
                 Console.ResetColor();
                 Console.WriteLine(new string('=', server.Name.Length));
                 Console.WriteLine(server.Name);
@@ -43,6 +57,9 @@ namespace The_Wanderers_Helper.Events
                 }
 
                 Console.ResetColor();
+                Console.WriteLine("Register interactions...");
+                await interactions.RegisterCommandsToGuildAsync(serverConfig.Key);
+
                 Console.WriteLine(new string('=', server.Name.Length) + "\n");
             }
         }

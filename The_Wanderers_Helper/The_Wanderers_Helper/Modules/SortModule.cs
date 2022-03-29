@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using System.Linq;
 using System.Threading.Tasks;
 using The_Wanderers_Helper.Services;
@@ -8,10 +8,8 @@ namespace The_Wanderers_Helper.Modules
 {
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
     [RequireOwner(Group = "Permission")]
-    [Name("Sorting")]
-    [Group("sort")]
-    [Summary("Sorting roles")]
-    public class SortRoleModule : ModuleBase<SocketCommandContext>
+    [Group("sort", "Sorting roles")]
+    public class SortRoleModule : InteractionModuleBase<InteractionContext>
     {
         private readonly ConfigService _configService;
 
@@ -20,53 +18,61 @@ namespace The_Wanderers_Helper.Modules
             _configService = configService;
         }
 
-        [Command("add")]
-        [Summary("Add a new guild")]
-        public async Task Add([Summary("role")] IRole role)
+        [SlashCommand("add", "Add a new guild")]
+        public async Task Add([Summary("guild", "A guild that should be added to the sorting menu")] IRole role)
         {
             var config = await _configService.GetServerConfig(Context.Guild.Id);
 
             if (!config.SortRoles.Contains(role.Id))
+            {
                 config.SortRoles.Add(role.Id);
-
-            await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
-            await Context.Channel.SendMessageAsync($"Successfully added `{role.Name}` to the sorting guilds");
+                await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
+                await RespondAsync($"Successfully added `{role.Name}` to the sorting guilds");
+            }
+            else
+            {
+                await RespondAsync($"`{role.Name}` is already a sorting guild");
+            }
         }
 
-        [Command("remove")]
-        [Summary("Remove a guild")]
-        public async Task Remove([Summary("role")] IRole role)
+        [SlashCommand("remove", "Remove a guild")]
+        public async Task Remove([Summary("guild", "A guild that should be removed from the sorting menu")] IRole role)
         {
             var config = await _configService.GetServerConfig(Context.Guild.Id);
 
-            if (config.SortRoles.Contains(role.Id))
+            if (!config.SortRoles.Contains(role.Id))
+            {
+                await RespondAsync($"`{role.Name}` is not a sorting guild");
+            }
+            else
+            {
                 config.SortRoles.Remove(role.Id);
+                await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
+                await RespondAsync($"Successfully removed `{role.Name}` from the sorting guilds");
 
-            await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
-            await Context.Channel.SendMessageAsync($"Successfully removed `{role.Name}` from the sorting guilds");
+            }
         }
 
-        [Command("list")]
-        [Summary("List the sorting guilds")]
+        [SlashCommand("list", "List the sorting guilds")]
         public async Task List()
         {
             var config = await _configService.GetServerConfig(Context.Guild.Id);
-
             var roles = config.SortRoles.Select(x => Context.Guild.GetRole(x));
+
             string text = roles.Any()
                 ? string.Join("\n", roles.Select(r => $"- {r.Mention}"))
                 : "No guilds";
 
-            var rolesEmbed = new EmbedBuilder()
+            var embedBuilder = new EmbedBuilder()
                .WithDescription("Here are the guilds")
                .WithColor(new Color(78, 91, 245))
-               .AddField("Guilds", text);
+               .AddField("Guilds", text)
+               .WithFooter("Created by Wout");
 
-            await Context.Channel.SendMessageAsync(embed: rolesEmbed.Build());
+            await RespondAsync(embed: embedBuilder.Build());
         }
 
-        [Command]
-        [Summary("Display the sorting buttons")]
+        [SlashCommand("menu", "Display the sorting menu")]
         public async Task Sort()
         {
             var config = await _configService.GetServerConfig(Context.Guild.Id);
@@ -74,13 +80,17 @@ namespace The_Wanderers_Helper.Modules
             var roles = config.SortRoles.Select(x => Context.Guild.GetRole(x)).ToList();
 
             if (!roles.Any())
-                await Context.Channel.SendMessageAsync("No sorting guilds configured");
+            {
+                await RespondAsync("No sorting guilds configured");
+                return;
+            }
+               
 
             var rolesEmbed = new EmbedBuilder()
                 .WithTitle("Choose a guild to get sorted in")
-               .WithDescription("Click on the button with your guild")
-               .WithColor(new Color(78, 91, 245))
-               .WithFooter("Created by Wout");
+                .WithDescription("Click on the button with your guild")
+                .WithColor(new Color(78, 91, 245))
+                .WithFooter("Created by Wout");
 
             var buttons = new ComponentBuilder();
             for (int i = 0; i < roles.Count; i++)
@@ -94,7 +104,7 @@ namespace The_Wanderers_Helper.Modules
                 buttons.WithButton(button, i % 2);
             }
 
-            await Context.Channel.SendMessageAsync(embed: rolesEmbed.Build(), component: buttons.Build());
+            await RespondAsync(embed: rolesEmbed.Build(), components: buttons.Build());
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
@@ -34,17 +34,12 @@ namespace The_Wanderers_Helper
                 LogLevel = LogSeverity.Info,
                 MessageCacheSize = 100
             }))
-            .AddSingleton(new CommandService(new CommandServiceConfig
-            {
-                LogLevel = LogSeverity.Info,
-                DefaultRunMode = RunMode.Async,
-            }))
+            .AddSingleton(s => new InteractionService(s.GetRequiredService<DiscordSocketClient>()))
             //Events
             .AddSingleton<GuildEvent>()
             .AddSingleton<InteractionEvent>()
             .AddSingleton<ReadyEvent>()
             //Services
-            .AddSingleton<CommandsService>()
             .AddSingleton<ConfigService>()
             .AddSingleton<LoggingService>()
             .AddSingleton<StartupService>()

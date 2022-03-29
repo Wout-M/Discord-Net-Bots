@@ -61,6 +61,7 @@ namespace Discord_Bot.Events
                 Console.ResetColor();
                 Console.WriteLine("Register interactions...");
                 await interactions.RegisterCommandsToGuildAsync(serverConfig.Key);
+
                 Console.WriteLine(new string('=', server.Name.Length) + "\n");
             }
         }

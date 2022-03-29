@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Modules
 {
-    [Group("sort", "Sorting")]
+    [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
+    [RequireOwner(Group = "Permission")]
+    [Group("sort", "Sorting roles")]
     public class SortModule : InteractionModuleBase<InteractionContext>
     {
         private readonly ConfigService _configService;
@@ -19,63 +21,91 @@ namespace Discord_Bot.Modules
             _configService = configService;
         }
 
+        [SlashCommand("add", "Add a new role")]
+        public async Task Add([Summary("role", "A role that should be added to the sorting menu")] IRole role)
+        {
+            var config = await _configService.GetServerConfig(Context.Guild.Id);
+            
+            if (!config.SortRoles.Contains(role.Id))
+            {
+                config.SortRoles.Add(role.Id);
+                await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
+                await RespondAsync($"Successfully added `{role.Name}` to the sorting roles");
+            }
+            else
+            {
+                await RespondAsync($"`{role.Name}` is already a sorting role");
+            }
+        }
+
+        [SlashCommand("remove", "Remove a role")]
+        public async Task Remove([Summary("role", "A role that should be removed from the sorting menu")] IRole role)
+        {
+            var config = await _configService.GetServerConfig(Context.Guild.Id);
+            
+            if (!config.SortRoles.Contains(role.Id))
+            {
+                await RespondAsync($"`{role.Name}` is not a sorting role");
+            }
+            else
+            {
+                config.SortRoles.Remove(role.Id);
+                await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
+                await RespondAsync($"Successfully removed `{role.Name}` from the sorting roles");
+
+            }
+        }
+
+        [SlashCommand("list", "List the sorting roles")]
+        public async Task List()
+        {
+            var config = await _configService.GetServerConfig(Context.Guild.Id);
+            var roles = config.SortRoles.Select(x => Context.Guild.GetRole(x));
+            
+            string text = roles.Any()
+                ? string.Join("\n", roles.Select(r => $"- {r.Mention}"))
+                : "No guilds";
+
+            var embedBuilder = new EmbedBuilder()
+               .WithDescription("Here are the guilds")
+               .WithColor(new Color(78, 91, 245))
+               .AddField("Guilds", text);
+
+            await RespondAsync(embed: embedBuilder.Build());
+        }
 
         [SlashCommand("menu", "Display the sorting menu")]
         public async Task Menu()
         {
-            var embedBuilder = new EmbedBuilder()
-                .WithTitle("Choose the roles you want")
-                .WithDescription("Click on the button with your role")
-               .WithColor(new Color(78, 91, 245))
-               .WithFooter("Created by Wout");
+            var config = await _configService.GetServerConfig(Context.Guild.Id);
+            var roles = config.SortRoles.Select(id => Context.Guild.GetRole(id)).ToList();
 
-
-            var roles = new ComponentBuilder();
-
-            for (int i = 0; i < 4; i++)
+            if (!roles.Any())
             {
-                var button = new ButtonBuilder()
+                await RespondAsync("No sorting roles configured");
+            }
+            else
+            {
+                var embedBuilder = new EmbedBuilder()
+                    .WithTitle("Choose the roles you want")
+                    .WithDescription("Click on the button with your role")
+                    .WithColor(new Color(78, 91, 245))
+                    .WithFooter("Created by Wout");
+
+                var buttonBuilder = new ComponentBuilder();
+
+                for (int i = 0; i < roles.Count; i++)
                 {
-                    Label = $"test-{i}",
-                    CustomId = $"sortrole-{i}",
-                    Style = (ButtonStyle)(((i + 1) % 4) + 1)
-                };
-                roles.WithButton(button, i % 2);
-            }
+                    var button = new ButtonBuilder()
+                    {
+                        Label = roles[i].Name,
+                        CustomId = $"sortrole-{roles[i].Id}",
+                        Style = (ButtonStyle)(((i + 1) % 4) + 1)
+                    };
+                    buttonBuilder.WithButton(button, i % 2);
+                }
 
-            await RespondAsync(embed: embedBuilder.Build(), components: roles.Build());
-        }
-
-        [SlashCommand("add", "Add a new role")]
-        public async Task Add(IRole role)
-        {
-            var config = await _configService.GetServerConfig(Context.Guild.Id);
-            if (!config.SortRoles.Contains(role.Id))
-            {
-                config.SortRoles.Add(role.Id);
-                await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
-                await RespondAsync($"You added **{role.Name}** to the sorting roles");
-            }
-            else
-            {
-                await RespondAsync($"**{role.Name}** is already a sorting role");
-            }   
-        }
-
-        [SlashCommand("remove", "Remove a role")]
-        public async Task Remove(IRole role)
-        {
-            var config = await _configService.GetServerConfig(Context.Guild.Id);
-            if (!config.SortRoles.Contains(role.Id))
-            {
-                await RespondAsync($"**{role.Name}** is already a sorting role");
-            }
-            else
-            {
-                config.SortRoles.Add(role.Id);
-                await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
-                await RespondAsync($"You added **{role.Name}** to the sorting roles");
-                
+                await RespondAsync(embed: embedBuilder.Build(), components: buttonBuilder.Build());
             }
         }
     }

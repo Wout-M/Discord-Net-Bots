@@ -1,86 +1,79 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using The_Wanderers_Helper.Services;
 
 namespace The_Wanderers_Helper.Events
 {
     public class InteractionEvent
     {
-        private readonly ConfigService _configService;
+        private readonly IServiceProvider _provider;
+        private readonly DiscordSocketClient _client;
+        private readonly InteractionService _commands;
 
-        public InteractionEvent(ConfigService configService)
+        public InteractionEvent(IServiceProvider provider, DiscordSocketClient client, InteractionService commands)
         {
-            _configService = configService;
+            _provider = provider;
+            _client = client;
+            _commands = commands;
         }
 
-        public async Task InteractionCreated(SocketInteraction interaction)
+        public async Task SlashCommandExecuted(SlashCommandInfo command, IInteractionContext context, IResult result)
         {
-            switch (interaction)
+            if (result.Error.HasValue)
             {
-                case SocketSlashCommand commandInteraction:
+                switch (result.Error.Value)
+                {
+                    //case CommandError.UnknownCommand:
+                    //    break;
+                    //case CommandError.ParseFailed:
+                    //    break;
+                    //case CommandError.BadArgCount:
 
-                    break;
-
-                case SocketMessageComponent componentInteraction:
-                    await MyMessageComponentHandler(componentInteraction);
-                    break;
-
-                default:
-                    break;
+                    //    break;
+                    //case CommandError.ObjectNotFound:
+                    //    break;
+                    //case CommandError.MultipleMatches:
+                    //    break;
+                    case InteractionCommandError.UnmetPrecondition:
+                        await context.Interaction.RespondAsync($"{context.User.Mention}, you don't have permissions to use this command");
+                        break;
+                    case InteractionCommandError.Exception:
+                        await context.Interaction.RespondAsync($"{context.User.Mention}, an error occured while using this command");
+                        break;
+                        //case CommandError.Unsuccessful:
+                        //    break;
+                        //default:
+                        //    break;
+                }
             }
         }
 
-        private async Task MyMessageComponentHandler(SocketMessageComponent interaction)
+        public async Task HandleInteraction(SocketSlashCommand interaction)
         {
-            switch (interaction.Data.CustomId)
+            try
             {
-                case string s when s.StartsWith("quiz"):
-                    await ProcessQuiz(interaction);
-                    break;
-                case string s when s.StartsWith("sort"):
-                    await ProcessSort(interaction);
-                    break;
-                default:
-                    break;
+                // create an execution context that matches the generic type parameter of your InteractionModuleBase<T> modules
+                var ctx = new InteractionContext(_client, interaction);
+                await _commands.ExecuteCommandAsync(ctx, _provider);
             }
-
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                // if a Slash Command execution fails it is most likely that the original interaction acknowledgement will persist. It is a good idea to delete the original
+                // response, or at least let the user know that something went wrong during the command execution.
+                if (interaction.Type == InteractionType.ApplicationCommand)
+                {
+                    await interaction.GetOriginalResponseAsync().ContinueWith(async (msg) => await msg.Result.DeleteAsync());
+                }
+            }
         }
 
-        public async Task ProcessQuiz(SocketMessageComponent clickedButton)
+        public async Task HandleButtonInteraction(SocketMessageComponent interaction)
         {
-            bool correct = clickedButton.Data.CustomId.EndsWith("correct");
-            var actionRow = clickedButton.Message.Components.First(comp => comp.Components.Any(button => ((ButtonComponent)button).CustomId == clickedButton.Data.CustomId));
-            string answer = ((ButtonComponent)actionRow.Components.FirstOrDefault(button => ((ButtonComponent)button).CustomId == clickedButton.Data.CustomId)).Label;
-            string text = correct
-                ? $"`{answer}` is correct! Congratulations {clickedButton.User.Mention}"
-                : $"`{answer}` was not the correct answer, {clickedButton.User.Mention}";
-
-            await clickedButton.Message.DeleteAsync();
-            await clickedButton.Channel.SendMessageAsync(text);
-        }
-
-        public async Task ProcessSort(SocketMessageComponent button)
-        {
-            if (!(button.Channel is ITextChannel channel)) return;
-            if (!(button.User is IGuildUser user)) return;
-
-            var config = await _configService.GetServerConfig(channel.GuildId);
-            if (user.RoleIds.Any(r => config.SortRoles.Contains(r)))
-            {
-                await button.FollowupAsync($"{user.Mention}, you have already been sorted. If you wish to change your guild, please contact one of the wardens", ephemeral: true);
-                return;
-            }
-
-            ulong roleId = ulong.Parse(button.Data.CustomId.Substring(button.Data.CustomId.IndexOf("_") + 1));
-            var role = channel.Guild.GetRole(roleId);
-
-            await user.AddRoleAsync(roleId);
-            await button.FollowupAsync($"{user.Mention}, you have been successfully sorted into {role.Mention}", ephemeral: true);
+            var ctx = new SocketInteractionContext<SocketMessageComponent>(_client, interaction);
+            await _commands.ExecuteCommandAsync(ctx, _provider);
         }
     }
 }

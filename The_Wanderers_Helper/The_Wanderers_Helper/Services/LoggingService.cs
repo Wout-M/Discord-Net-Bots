@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using System;
 using System.IO;
@@ -14,7 +15,7 @@ namespace The_Wanderers_Helper.Services
         private string _logDirectory { get; }
         private string _logFile => Path.Combine(_logDirectory, $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.txt");
 
-        public LoggingService(DiscordSocketClient client, CommandService command)
+        public LoggingService(DiscordSocketClient client, InteractionService command)
         {
             _logDirectory = Path.Combine(AppContext.BaseDirectory, "logs");
 
