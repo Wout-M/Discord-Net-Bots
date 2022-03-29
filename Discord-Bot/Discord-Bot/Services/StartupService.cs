@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using System;
 using System.Reflection;
@@ -13,14 +14,14 @@ namespace Discord_Bot.Services
         private readonly DiscordSocketClient _client;
         private readonly ConfigService _configService;
         private readonly EventService _eventService;
-        private readonly CommandService _commands;
+        private readonly InteractionService _commands;
 
         public StartupService(
             IServiceProvider provider,
             DiscordSocketClient client,
             ConfigService configService,
             EventService eventService,
-            CommandService commands)
+            InteractionService commands)
         {
             _provider = provider;
             _client = client;
@@ -34,10 +35,10 @@ namespace Discord_Bot.Services
             string discordToken = (await _configService.GetConfig()).Token;
 
             _eventService.RegisterEvents();
-            await _client.LoginAsync(TokenType.Bot, discordToken);     
-            await _client.StartAsync();                               
+            await _client.LoginAsync(TokenType.Bot, discordToken);
+            await _client.StartAsync();
 
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);   
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
         }
     }
 }

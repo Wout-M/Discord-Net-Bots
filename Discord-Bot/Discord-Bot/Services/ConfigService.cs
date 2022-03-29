@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
@@ -27,7 +26,7 @@ namespace Discord_Bot.Services
             {
                 if (File.Exists($"{_configName}.json"))
                 {
-                    _config =  JsonConvert.DeserializeObject<BotConfig>(await File.ReadAllTextAsync($"{_configName}.json"));
+                    _config = JsonConvert.DeserializeObject<BotConfig>(await File.ReadAllTextAsync($"{_configName}.json"));
                 }
                 else
                 {
@@ -36,7 +35,7 @@ namespace Discord_Bot.Services
                     _config = new BotConfig();
                     _config.Token = GetProperty<string>("token");
                     _config.OwnerID = GetProperty<ulong>("owner ID");
-                    _config.Prefix = GetProperty<char>("prefix");
+                    _config.Prefix = GetProperty<string>("prefix");
 
                     await AddOrUpdateConfig(_config);
                 }

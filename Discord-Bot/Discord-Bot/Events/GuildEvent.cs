@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Events
 {
-    public class GuildEvents
+    public class GuildEvent
     {
         private readonly ConfigService _configService;
 
-        public GuildEvents(ConfigService configService)
+        public GuildEvent(ConfigService configService)
         {
             _configService = configService;
         }
