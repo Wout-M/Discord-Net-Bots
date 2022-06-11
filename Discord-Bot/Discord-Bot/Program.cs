@@ -1,8 +1,8 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Discord_Bot.Events;
+using Discord_Bot.Jobs;
 using Discord_Bot.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
@@ -47,7 +47,11 @@ namespace Discord_Bot
            .AddSingleton<StartupService>()
            .AddSingleton<EventService>()
            //HttpClientFactory
-           .AddHttpClient();
+           .AddHttpClient()
+           //Quartz
+           .AddScoped<BirthdayJob>()
+           .AddQuartz();
+            
         }
     }
 }

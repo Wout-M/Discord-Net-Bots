@@ -20,5 +20,18 @@ namespace Discord_Bot.Modules
         }
 
         #endregion
+
+        [SlashCommand("event", "Test event")]
+        public async Task Event()
+        {
+            await Context.Guild.CreateEventAsync("test event",
+                                                 DateTime.Now.AddSeconds(2),
+                                                 Discord.GuildScheduledEventType.External,
+                                                 description: "test",
+                                                 endTime: DateTime.Now.AddMinutes(4),
+                                                 location: "test");
+            await RespondAsync("test event created");
+        }
+
     }
 }

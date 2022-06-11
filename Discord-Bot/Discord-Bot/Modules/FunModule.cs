@@ -125,11 +125,6 @@ namespace Discord_Bot.Modules
                 {
                     await response.DeleteAsync();
                 }
-                //if (existingMsg != null)
-                //{
-                //    await msg.DeleteAsync();
-                //    await Context.Channel.SendMessageAsync("Nobody managed to answer in time");
-                //}
             }
         }
 
