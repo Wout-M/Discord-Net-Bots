@@ -98,7 +98,7 @@ namespace The_Wanderers_Helper.Modules
                 var button = new ButtonBuilder()
                 {
                     Label = roles[i].Name,
-                    CustomId = $"sort_{roles[i].Id}",
+                    CustomId = $"sortrole-{roles[i].Id}",
                     Style = (ButtonStyle)(((i + 1) % 4) + 1)
                 };
                 buttons.WithButton(button, i % 2);
