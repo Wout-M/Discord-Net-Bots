@@ -78,7 +78,7 @@ namespace Discord_Bot.Modules
 
             var embedBuilder = new EmbedBuilder()
                 .WithDescription("Here's a list of everyones birthday")
-                .WithColor(new Color(78, 91, 245))
+                .WithColor(Color.DarkPurple)
                 .AddField("Birthdays", text);
 
             await RespondAsync(embed: embedBuilder.Build());
@@ -160,7 +160,7 @@ namespace Discord_Bot.Modules
 
             var embedBuilder = new EmbedBuilder()
                 .WithDescription("Is birthday checking running?")
-                .WithColor(new Color(78, 91, 245))
+                .WithColor(Color.DarkTeal)
                 .AddField("Enabled (for this server)", config.EnableBirthdayChecking ? "Enabled" : "Disabled")
                 .AddField("Running (for all servers)", text);
 

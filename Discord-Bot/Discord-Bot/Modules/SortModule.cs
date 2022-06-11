@@ -68,7 +68,7 @@ namespace Discord_Bot.Modules
 
             var embedBuilder = new EmbedBuilder()
                .WithDescription("Here are the guilds")
-               .WithColor(new Color(78, 91, 245))
+               .WithColor(Color.DarkGreen)
                .AddField("Guilds", text);
 
             await RespondAsync(embed: embedBuilder.Build());
@@ -89,7 +89,7 @@ namespace Discord_Bot.Modules
                 var embedBuilder = new EmbedBuilder()
                     .WithTitle("Choose the roles you want")
                     .WithDescription("Click on the button with your role")
-                    .WithColor(new Color(78, 91, 245))
+                    .WithColor(Color.DarkBlue)
                     .WithFooter("Created by Wout");
 
                 var buttonBuilder = new ComponentBuilder();
