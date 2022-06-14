@@ -1,0 +1,30 @@
+name: Build Wanderer
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore "./The_Wanderers_Helper"
+    - name: Build
+      run: dotnet build "./The_Wanderers_Helper" --configuration Release --no-restore
+    - name: Test
+      run: dotnet test "./The_Wanderers_Helper" --no-restore --verbosity normal
+    - name: Publish
+      run: dotnet publish "./The_Wanderers_Helper" -r linux-arm64 -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -c Release -o The_Wanderers_Helper
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+       name: The_Wanderers_Helper
+       path: "./The_Wanderers_Helper" 
