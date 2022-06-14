@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using The_Wanderers_Helper.Events;
+using The_Wanderers_Helper.Jobs;
 using The_Wanderers_Helper.Services;
 
 namespace The_Wanderers_Helper
@@ -45,8 +46,10 @@ namespace The_Wanderers_Helper
             .AddSingleton<StartupService>()
             .AddSingleton<EventService>()
             //HttpClientFactory
-            .AddHttpClient();
-
+            .AddHttpClient()
+            //Quartz
+           .AddScoped<BirthdayJob>()
+           .AddQuartz();
         }
     }
 }

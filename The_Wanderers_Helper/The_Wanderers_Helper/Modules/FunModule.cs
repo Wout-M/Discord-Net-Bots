@@ -35,7 +35,7 @@ namespace The_Wanderers_Helper.Modules
                 var quizEmbed = new EmbedBuilder()
                     .WithAuthor(Context.Client.CurrentUser)
                     .WithTitle(CleanText(result.Question))
-                    .WithColor(new Color(78, 91, 245))
+                    .WithColor(Color.Gold)
                     .WithFooter("You have 20 seconds to answer")
                     .AddField("Category", result.Category, true)
                     .AddField("Difficulty", result.Difficulty, true);
@@ -183,6 +183,25 @@ namespace The_Wanderers_Helper.Modules
         public async Task Dice(int number)
         {
             await RespondAsync($"You rolled **{new Random().Next(number + 1)}**");
+        }
+
+        #endregion
+
+        #region Quote
+
+        [SlashCommand("quote", "Get a quote from InspiroBot")]
+        public async Task Quote()
+        {
+            using (var http = _httpService.CreateClient())
+            {
+                var quoteRequest = await http.GetAsync("https://inspirobot.me/api?generate=true");
+                string imageURL = await quoteRequest.Content.ReadAsStringAsync();
+
+                using (var stream = await http.GetStreamAsync(imageURL))
+                {
+                    await RespondWithFileAsync(stream, "quote.jpg");
+                }
+            }
         }
 
         #endregion

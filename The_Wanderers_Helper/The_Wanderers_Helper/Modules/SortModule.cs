@@ -65,7 +65,7 @@ namespace The_Wanderers_Helper.Modules
 
             var embedBuilder = new EmbedBuilder()
                .WithDescription("Here are the guilds")
-               .WithColor(new Color(78, 91, 245))
+               .WithColor(Color.DarkGreen)
                .AddField("Guilds", text)
                .WithFooter("Created by Wout");
 
@@ -89,7 +89,7 @@ namespace The_Wanderers_Helper.Modules
             var rolesEmbed = new EmbedBuilder()
                 .WithTitle("Choose a guild to get sorted in")
                 .WithDescription("Click on the button with your guild")
-                .WithColor(new Color(78, 91, 245))
+                .WithColor(Color.DarkBlue)
                 .WithFooter("Created by Wout");
 
             var buttons = new ComponentBuilder();
