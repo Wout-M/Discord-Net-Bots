@@ -22,9 +22,9 @@ jobs:
     - name: Test
       run: dotnet test "./The_Wanderers_Helper" --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish "./The_Wanderers_Helper" -r linux-arm64 -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -c Release #-o The_Wanderers_Helper
+      run: dotnet publish "./The_Wanderers_Helper" -c Release #-o The_Wanderers_Helper
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
        name: The_Wanderers_Helper
-       path: "./The_Wanderers_Helper/The_Wanderers_Helper/bin/Release/net6.0/linux-arm64/publish/The_Wanderers_Helper" 
+       path: "./The_Wanderers_Helper/The_Wanderers_Helper/bin/Release/net6.0/publish/" 
