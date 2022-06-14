@@ -39,7 +39,6 @@ namespace Discord_Bot
            .AddSingleton<GuildEvent>()
            .AddSingleton<ReadyEvent>()
            .AddSingleton<MessageEvent>()
-           .AddSingleton<LoggedInEvent>()
            .AddSingleton<InteractionEvent>()
            //Services
            .AddSingleton<ConfigService>()

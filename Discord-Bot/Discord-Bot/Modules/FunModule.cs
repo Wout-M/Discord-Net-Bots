@@ -85,7 +85,7 @@ namespace Discord_Bot.Modules
             await RespondAsync($"You rolled **{new Random().Next(number + 1)}**");
         }
 
-        [SlashCommand("quote", "Get a quote from inspirobot")]
+        [SlashCommand("quote", "Get a quote from InspiroBot")]
         public async Task Quote()
         {
             using (var http = _httpService.CreateClient())
