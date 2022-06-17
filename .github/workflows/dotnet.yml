@@ -38,7 +38,7 @@ jobs:
       run: |
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add ./The_Wanderers_Helper/The_Wanderers_Helper/bin/Release/net6.0/publish/\*
+        git add ./The_Wanderers_Helper/The_Wanderers_Helper/bin/Release/net6.0/publish
         git commit -m "Add changes ${{ steps.date.outputs.date }}" 
     - name: Push changes
       uses: ad-m/github-push-action@master
