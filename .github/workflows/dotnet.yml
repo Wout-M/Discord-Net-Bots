@@ -2,7 +2,10 @@ name: Build Wanderer
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - 'main'
+    paths:
+      - 'The_Wanderers_Helper/**'
 
 jobs:
   build:
