@@ -28,20 +28,11 @@ jobs:
       run: dotnet test "./The_Wanderers_Helper" --no-restore --verbosity normal
 
     - name: Publish
-      run: dotnet publish "./The_Wanderers_Helper" -c Release
+      run: dotnet publish "./The_Wanderers_Helper" -c Release -o release
 
-    - name: Get current date
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-
-    - name: Commit files
-      run: |
-        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add -f ./The_Wanderers_Helper/The_Wanderers_Helper/bin/Release/net6.0/publish
-        git commit -m "Add changes ${{ steps.date.outputs.date }}" 
-    - name: Push changes
-      uses: ad-m/github-push-action@master
+    - name: Commit to Wanderer
+      uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: "Wanderer"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: wanderer
+        FOLDER: release
