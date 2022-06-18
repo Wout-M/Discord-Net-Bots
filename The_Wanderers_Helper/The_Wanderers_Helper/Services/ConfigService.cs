@@ -35,7 +35,6 @@ namespace The_Wanderers_Helper.Services
                     _config = new BotConfig();
                     _config.Token = GetProperty<string>("token");
                     _config.OwnerID = GetProperty<ulong>("owner ID");
-                    _config.Prefix = GetProperty<string>("prefix");
 
                     await AddOrUpdateConfig(_config);
                 }

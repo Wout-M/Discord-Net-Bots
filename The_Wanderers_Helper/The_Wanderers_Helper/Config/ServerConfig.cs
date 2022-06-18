@@ -7,11 +7,11 @@ namespace The_Wanderers_Helper.Config
     {
         public ServerConfig()
         {
-            SortRoles = new List<ulong>();
+            SortRoles = new();
+            Birthdays = new();
         }
 
         public string Name { get; set; }
-        public string Prefix { get; set; }
         public ulong? ModChannel { get; set; }
         public bool EnableBirthdayChecking { get; set; }
         public List<ulong> SortRoles { get; set; }

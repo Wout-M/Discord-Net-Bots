@@ -25,7 +25,6 @@ namespace The_Wanderers_Helper.Events
                 var serverConfig = new ServerConfig()
                 {
                     Name = guild.Name,
-                    Prefix = config.Prefix
                 };
                 await _configService.AddOrUpdateServerConfig(guild.Id, serverConfig);
             }
