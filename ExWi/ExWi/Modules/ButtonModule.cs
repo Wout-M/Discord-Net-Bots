@@ -29,14 +29,15 @@ namespace ExWi.Modules
             }
 
             var config = await _configService.GetServerConfig(Context.Guild.Id);
-            if (user.RoleIds.Any(r => config.SortRoles.Contains(r)))
+            if (user.RoleIds.Any(r => r == roleId))
             {
-                await RespondAsync($"{user.Mention}, you have already been sorted. If you wish to change your guild, please contact one of the wardens", ephemeral: true);
+                await user.RemoveRoleAsync(roleId);
+                await RespondAsync($"{user.Mention}, you already had this role. This role has been removed", ephemeral: true);
                 return;
             }
 
             var role = Context.Guild.GetRole(roleId);
-            await user.AddRoleAsync(role);
+            await user.AddRoleAsync(roleId);
             await RespondAsync($"{user.Mention}, you have been successfully sorted into {role.Mention}", ephemeral: true);
         }
     }

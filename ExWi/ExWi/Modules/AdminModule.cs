@@ -29,6 +29,20 @@ namespace ExWi.Modules
 
         #endregion
 
+        #region LogChannel
+
+        [SlashCommand("log", "Configure the log channel")]
+        public async Task LogChannel(ITextChannel channel)
+        {
+            var config = await _configService.GetServerConfig(Context.Guild.Id);
+            config.LogChannel = channel.Id;
+            await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
+
+            await RespondAsync($"{channel.Mention} has been configured as log channel");
+        }
+
+        #endregion
+
         #region Check
 
         [SlashCommand("check", "Check the bots configurations")]
@@ -39,18 +53,30 @@ namespace ExWi.Modules
                 .WithTitle("My configurations")
                 .WithFooter("Created by Wout");
 
-            string modChannelText = "No channel has been configured";
-            embed.WithColor(Color.Red);
+            string noChannelText = "No channel has been configured";
+            string modChannelText = noChannelText;
             if (config.ModChannel.HasValue)
             {
                 var channel = await Context.Guild.GetTextChannelAsync(config.ModChannel.Value);
                 if (channel != null)
                 {
                     modChannelText = $"{channel.Mention}";
-                    embed.WithColor(Color.Green);
                 }
             }
             embed.AddField("Mod channel", modChannelText);
+
+            string logChannelText = noChannelText;
+            if (config.ModChannel.HasValue)
+            {
+                var channel = await Context.Guild.GetTextChannelAsync(config.ModChannel.Value);
+                if (channel != null)
+                {
+                    logChannelText = $"{channel.Mention}";
+                }
+            }
+            embed.AddField("Log channel", logChannelText);
+
+            embed.WithColor((modChannelText != noChannelText && logChannelText != noChannelText) ? Color.Green : Color.Red);
 
             await RespondAsync(embed: embed.Build());
         }

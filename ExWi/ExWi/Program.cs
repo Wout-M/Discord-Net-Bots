@@ -31,6 +31,7 @@ void RegisterServices(IServiceCollection services)
     .AddSingleton(s => new InteractionService(s.GetRequiredService<DiscordSocketClient>()))
     //Events
     .AddSingleton<GuildEvent>()
+    .AddSingleton<MessageEvent>()
     .AddSingleton<InteractionEvent>()
     .AddSingleton<ReadyEvent>()
     //Services

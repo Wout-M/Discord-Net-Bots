@@ -16,8 +16,8 @@ namespace ExWi.Modules
             _configService = configService;
         }
 
-        [SlashCommand("add", "Add a new guild")]
-        public async Task Add([Summary("guild", "A guild that should be added to the sorting menu")] IRole role)
+        [SlashCommand("add", "Add a new role")]
+        public async Task Add([Summary("role", "A role that should be added to the sorting menu")] IRole role)
         {
             var config = await _configService.GetServerConfig(Context.Guild.Id);
 
@@ -25,33 +25,33 @@ namespace ExWi.Modules
             {
                 config.SortRoles.Add(role.Id);
                 await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
-                await RespondAsync($"Successfully added `{role.Name}` to the sorting guilds");
+                await RespondAsync($"Successfully added `{role.Name}` to the sorting menu");
             }
             else
             {
-                await RespondAsync($"`{role.Name}` is already a sorting guild");
+                await RespondAsync($"`{role.Name}` is already a sorting role");
             }
         }
 
-        [SlashCommand("remove", "Remove a guild")]
-        public async Task Remove([Summary("guild", "A guild that should be removed from the sorting menu")] IRole role)
+        [SlashCommand("remove", "Remove a role")]
+        public async Task Remove([Summary("role", "A role that should be removed from the sorting menu")] IRole role)
         {
             var config = await _configService.GetServerConfig(Context.Guild.Id);
 
             if (!config.SortRoles.Contains(role.Id))
             {
-                await RespondAsync($"`{role.Name}` is not a sorting guild");
+                await RespondAsync($"`{role.Name}` is not a sorting role");
             }
             else
             {
                 config.SortRoles.Remove(role.Id);
                 await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
-                await RespondAsync($"Successfully removed `{role.Name}` from the sorting guilds");
+                await RespondAsync($"Successfully removed `{role.Name}` from the sorting menu");
 
             }
         }
 
-        [SlashCommand("list", "List the sorting guilds")]
+        [SlashCommand("list", "List the sorting roles")]
         public async Task List()
         {
             var config = await _configService.GetServerConfig(Context.Guild.Id);
@@ -59,12 +59,12 @@ namespace ExWi.Modules
 
             string text = roles.Any()
                 ? string.Join("\n", roles.Select(r => $"- {r.Mention}"))
-                : "No guilds";
+                : "No roles";
 
             var embedBuilder = new EmbedBuilder()
-               .WithDescription("Here are the guilds")
+               .WithDescription("Here are the roles")
                .WithColor(Color.DarkGreen)
-               .AddField("Guilds", text)
+               .AddField("Roles", text)
                .WithFooter("Created by Wout");
 
             await RespondAsync(embed: embedBuilder.Build());
@@ -79,14 +79,14 @@ namespace ExWi.Modules
 
             if (!roles.Any())
             {
-                await RespondAsync("No sorting guilds configured");
+                await RespondAsync("No sorting roles configured");
                 return;
             }
 
 
             var rolesEmbed = new EmbedBuilder()
-                .WithTitle("Choose a guild to get sorted in")
-                .WithDescription("Click on the button with your guild")
+                .WithTitle("Choose a role to get sorted in")
+                .WithDescription("Klick auf den Button mit deiner Rolle. Möchtest du eine bereits bestehende Rolle entfernen, klicke nochmal auf den Button.")
                 .WithColor(Color.DarkBlue)
                 .WithFooter("Created by Wout");
 

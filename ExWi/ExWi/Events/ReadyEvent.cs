@@ -54,6 +54,17 @@ namespace ExWi.Events
                     Console.WriteLine("Add a mod channel");
                 }
 
+                if (server.LogChannel.HasValue)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Log channel configured");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Add a log channel");
+                }
+
                 Console.ResetColor();
                 Console.WriteLine("Register interactions...");
                 await interactions.RegisterCommandsToGuildAsync(serverConfig.Key);

@@ -23,19 +23,19 @@ namespace ExWi.Events
 
             var message = await before.GetOrDownloadAsync();
             var embed = new EmbedBuilder()
-                .AddField("Created", message.Timestamp.DateTime.ToString())
-                .AddField("Edited", after.EditedTimestamp!.Value.DateTime.ToString(), true)
+                .AddField("Created", message.Timestamp.DateTime.ToString("G"))
+                .AddField("Edited", after.EditedTimestamp!.Value.DateTime.ToString("G"), true)
                 .AddField("Author", after.Author.ToString())
                 .AddField("Channel", channel.Name, true)
-                .AddField("Old Message", message.Content)
-                .AddField("New Message", after.Content)
+                .AddField("Old Message", message.Content.Length > 1024 ? "This message is too long" : message.Content)
+                .AddField("New Message", after.Content.Length > 1024 ? "This message is too long" : after.Content)
                 .WithTitle("Message updated")
                 .WithColor(Color.DarkBlue)
                 .WithFooter(footer => footer.Text = "Created by the almighty ginger")
                 .WithAuthor(_client.CurrentUser)
                 .WithCurrentTimestamp();
 
-            //await SendLogEmbed(embed.Build(), channel, guildChannel);
+            await SendLogEmbed(embed.Build(), channel, guildChannel);
         }
 
         public async Task MessageDeleted(Cacheable<IMessage, ulong> deleted, Cacheable<IMessageChannel, ulong> cachedChannel)
@@ -47,10 +47,10 @@ namespace ExWi.Events
             {
                 if (deleted.Value.Author.IsBot || deleted.Value.Author.IsWebhook) return;
                 var embed = new EmbedBuilder()
-               .AddField("Deleted", DateTime.Now.ToString())
+               .AddField("Deleted", deleted.Value.Timestamp.DateTime.ToString("G"))
                .AddField("Author", deleted.Value.Author.ToString())
                .AddField("Channel", channel.Name, true)
-               .AddField("Message", deleted.Value.Content)
+               .AddField("Message", deleted.Value.Content.Length > 1024 ? "This message is too long" : deleted.Value.Content)
                .WithTitle("Message deleted")
                .WithColor(Color.DarkRed)
                .WithFooter(footer => footer.Text = "Created by the almighty ginger")
