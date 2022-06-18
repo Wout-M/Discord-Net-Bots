@@ -1,0 +1,41 @@
+name: Build ExWi
+
+on:
+  push:
+    branches: 
+      - 'main'
+    paths:
+      - 'ExWi/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+        fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore "./ExWi"
+
+    - name: Build
+      run: dotnet build "./ExWi" --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test "./ExWi" --no-restore --verbosity normal
+
+    - name: Publish
+      run: dotnet publish "./ExWi" -c Release -o release
+
+    - name: Commit to ExWi
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: exwi
+        FOLDER: release
