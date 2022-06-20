@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace The_Wanderers_Helper.Config
+﻿namespace KGB.Config
 {
     public class ServerConfig
     {
         public ServerConfig()
         {
             SortRoles = new();
-            Birthdays = new();
+            Words = new();
         }
 
         public string Name { get; set; }
         public ulong? ModChannel { get; set; }
+        public ulong? LogChannel { get; set; }
         public bool EnableBirthdayChecking { get; set; }
         public List<ulong> SortRoles { get; set; }
+        public List<(string word, List<(ulong userId, int count)> scores)> Words { get; set; }
         public List<(ulong userId, DateTime birthday)> Birthdays { get; set; }
     }
 }

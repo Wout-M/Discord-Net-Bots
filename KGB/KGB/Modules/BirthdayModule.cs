@@ -1,12 +1,14 @@
 ﻿using Discord;
 using Discord.Interactions;
+using KGB.Services;
 using Quartz;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using The_Wanderers_Helper.Services;
 
-namespace The_Wanderers_Helper.Modules
+namespace KGB.Modules
 {
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
     [RequireOwner(Group = "Permission")]
@@ -69,7 +71,7 @@ namespace The_Wanderers_Helper.Modules
             var birthdays = await Task.WhenAll(config.Birthdays.OrderBy(x => x.birthday).Select(async x =>
             {
                 var user = await Context.Guild.GetUserAsync(x.userId);
-                return $"`{x.birthday:dd/MM}`: {user.Username}";
+                return $"`{x.birthday:dd/MM/yyyy}`: {user.Username}";
             }));
 
             string text = birthdays.Any()

@@ -4,9 +4,9 @@ using Quartz;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using The_Wanderers_Helper.Services;
+using KGB.Services;
 
-namespace The_Wanderers_Helper.Jobs
+namespace KGB.Jobs
 {
     [DisallowConcurrentExecution]
     public class BirthdayJob : IJob
@@ -61,7 +61,7 @@ namespace The_Wanderers_Helper.Jobs
                                 await guild.CreateEventAsync(name: $"{user.Username}'s birthday",
                                                              startTime: new DateTimeOffset(today.AddTicks(difference.Ticks)),
                                                              type: GuildScheduledEventType.External,
-                                                             description: $"It's {user.Username}'s birthday",
+                                                             description: $"It's {user.Username}'s birthday. They'll turn {today.Year - birthday.birthday.Year} years old.",
                                                              endTime: new DateTimeOffset(today.AddDays(1).AddTicks(difference.Ticks)),
                                                              location: "Here");
                             }

@@ -1,11 +1,11 @@
-name: Build Wanderer
+name: Build KGB
 
 on:
   push:
     branches: 
       - 'main'
     paths:
-      - 'The_Wanderers_Helper/**'
+      - 'KGB/**'
 
 jobs:
   build:
@@ -19,20 +19,20 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Restore dependencies
-      run: dotnet restore "./The_Wanderers_Helper"
+      run: dotnet restore "./KGB"
 
     - name: Build
-      run: dotnet build "./The_Wanderers_Helper" --configuration Release --no-restore
+      run: dotnet build "./KGB" --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test "./The_Wanderers_Helper" --no-restore --verbosity normal
+      run: dotnet test "./KGB" --no-restore --verbosity normal
 
     - name: Publish
-      run: dotnet publish "./The_Wanderers_Helper" -c Release -o release
+      run: dotnet publish "./KGB" -c Release -o release
 
-    - name: Commit to Wanderer
+    - name: Commit to KGB
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: wanderer
+        BRANCH: kgb
         FOLDER: release
