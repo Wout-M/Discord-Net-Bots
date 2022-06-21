@@ -12,7 +12,7 @@ namespace KGB.Services
 
         public LoggingService(DiscordSocketClient client, InteractionService command)
         {
-            _logDirectory = Path.Combine(AppContext.BaseDirectory, "logs");
+            _logDirectory = "../logs";
 
             client.Log += LogAsync;
             command.Log += LogAsync;
