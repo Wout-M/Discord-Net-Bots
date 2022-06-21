@@ -1,12 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Quartz.Impl;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Jobs
 {
@@ -23,10 +17,10 @@ namespace Discord_Bot.Jobs
             scheduler.JobFactory = jobFactory;
             await scheduler.Start();
 
-
-            IJobDetail job = JobBuilder.Create<BirthdayJob>()
+            var jobKey = new JobKey("job1", "group1");
+            var job = JobBuilder.Create<BirthdayJob>()
                 .StoreDurably()
-                .WithIdentity("job1", "group1")
+                .WithIdentity(jobKey)
                 .WithDescription("Birthday checking")
                 .Build();
 

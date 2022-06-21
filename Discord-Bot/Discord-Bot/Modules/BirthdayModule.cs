@@ -68,8 +68,18 @@ namespace Discord_Bot.Modules
             var config = await _configService.GetServerConfig(Context.Guild.Id);
             var birthdays = await Task.WhenAll(config.Birthdays.OrderBy(x => x.Item2).Select(async x =>
             {
-                var user = await Context.Guild.GetUserAsync(x.Item1);
-                return $"`{x.Item2:dd/MM}`: {user.Username}";
+                var username = string.Empty;
+                var guildUser = await Context.Guild.GetUserAsync(x.Item1);
+                if (guildUser != null)
+                {
+                    username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
+                }
+                else
+                {
+                    var user = await Context.Client.GetUserAsync(x.Item1);
+                    username = user.Username;
+                }
+                return $"`{x.Item2:dd/MM}`: {username}";
             }));
 
             string text = birthdays.Any()

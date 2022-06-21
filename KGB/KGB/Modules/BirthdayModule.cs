@@ -70,8 +70,18 @@ namespace KGB.Modules
             var config = await _configService.GetServerConfig(Context.Guild.Id);
             var birthdays = await Task.WhenAll(config.Birthdays.OrderBy(x => x.birthday).Select(async x =>
             {
-                var user = await Context.Guild.GetUserAsync(x.userId);
-                return $"`{x.birthday:dd/MM/yyyy}`: {user.Username}";
+                var username = string.Empty;
+                var guildUser = await Context.Guild.GetUserAsync(x.userId);
+                if (guildUser != null)
+                {
+                    username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
+                }
+                else
+                {
+                    var user = await Context.Client.GetUserAsync(x.userId);
+                    username = user.Username;
+                }
+                return $"`{x.birthday:dd/MM}`: {username}";
             }));
 
             string text = birthdays.Any()
