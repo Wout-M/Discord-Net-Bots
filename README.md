@@ -45,6 +45,8 @@ There are multiple ways to host Discord bots, as can be found in the [Discord.NE
        │   {This will contain the possible error logs}
    ```
 2. If you're using one of my bots, clone the branch of your bot in a folder that's also called `bot-name`. Again, replace the name with your own one.
+   - `-b`: Clone a specific branch
+   - `--single-branch`: Clone only the history of this branch. Future fetches will also only look to this branch
    ```sh
    git clone -b {bot-name} --single-branch https://github.com/Wout-M/Discord-Net-Bots {bot-name}
    ```
