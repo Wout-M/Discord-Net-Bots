@@ -97,7 +97,12 @@ namespace The_Wanderers_Helper.Modules
                 .WithColor(Color.DarkPurple)
                 .AddField("Birthdays", text);
 
-            await RespondAsync(embed: embedBuilder.Build());
+            await ModifyOriginalResponseAsync(x => 
+            {
+                x.Content = null;
+                x.Components = null;
+                x.Embed = embedBuilder.Build(); 
+            });
         }
 
         [SlashCommand("start", "Start birthday checking")]
