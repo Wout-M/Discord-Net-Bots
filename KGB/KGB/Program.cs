@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using KGB.Events;
+using KGB.Jobs;
 using KGB.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,7 +27,8 @@ void RegisterServices(IServiceCollection services)
     services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
     {
         LogLevel = LogSeverity.Info,
-        MessageCacheSize = 100
+        MessageCacheSize = 100,
+        AlwaysDownloadUsers = true
     }))
     .AddSingleton(s => new InteractionService(s.GetRequiredService<DiscordSocketClient>()))
     //Events
@@ -40,5 +42,8 @@ void RegisterServices(IServiceCollection services)
     .AddSingleton<StartupService>()
     .AddSingleton<EventService>()
     //HttpClientFactory
-    .AddHttpClient();
+    .AddHttpClient()
+    //Quartz
+    .AddScoped<BirthdayJob>()
+    .AddQuartz();
 }

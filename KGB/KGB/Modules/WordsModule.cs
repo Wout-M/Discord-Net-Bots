@@ -81,36 +81,61 @@ namespace KGB.Modules
         }
 
         [SlashCommand("score", "Display the scoreboard")]
-        public async Task Menu()
+        public async Task Menu([Summary("word", "See how much everyone says a word")] string word)
         {
             var config = await _configService.GetServerConfig(Context.Guild.Id);
 
-            if (!config.Words.Any())
+            word = word.ToLower();
+
+            if (!config.Words.Any(x => x.word == word))
             {
-                await RespondAsync("No words configured");
+                await RespondAsync("This word is not being counted");
             }
             else
             {
-                var embedBuilder = new EmbedBuilder()
-                    .WithTitle("Choose the word you want to see the scoreboard of")
-                    .WithDescription("Click on the button with the word")
-                    .WithColor(Color.Purple)
-                    .WithFooter("Created by the almighty Ginger");
+                await DeferAsync();
 
-                var buttonBuilder = new ComponentBuilder();
+                var scores = config.Words.First(w => w.word == word).scores.OrderBy(x => x.count).Reverse();
+                var scoresEmbed = new EmbedBuilder()
+                    .WithTitle($"How much has `{word}` been said in {Context.Guild.Name}")
+                    .WithDescription($"`{word}` has been said `{scores.Sum(x => x.count)}` times")
+                    .WithFooter("Created by the almighty ginger");
 
-                for (int i = 0; i < config.Words.Count; i++)
+                if (scores.Any())
                 {
-                    var button = new ButtonBuilder()
+                    var users = await Task.WhenAll(scores.Select(async s =>
                     {
-                        Label = config.Words[i].word,
-                        CustomId = $"words-{config.Words[i].word}",
-                        Style = (ButtonStyle)(((i + 1) % 4) + 1)
-                    };
-                    buttonBuilder.WithButton(button);
+                        var username = string.Empty;
+                        var guildUser = await (Context.Guild as IGuild).GetUserAsync(s.userId);
+                        if (guildUser != null)
+                        {
+                            username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
+                        }
+                        else
+                        {
+                            var user = await Context.Client.GetUserAsync(s.userId);
+                            username = string.IsNullOrEmpty(user?.Username) ? "User not found" : user.Username;
+                        }
+
+                        return username;
+                    }));
+
+                    var usersText = string.Join(Environment.NewLine, users);
+                    var scoresText = string.Join(Environment.NewLine, scores.Select(s => s.count));
+                    scoresEmbed.AddField("Names", usersText, true)
+                               .AddField("Scores", scoresText, true);
+                }
+                else
+                {
+                    scoresEmbed.AddField("Scores", "This word hasn't been said yet");
                 }
 
-                await RespondAsync(embed: embedBuilder.Build(), components: buttonBuilder.Build());
+                await ModifyOriginalResponseAsync(x =>
+                {
+                    x.Content = null;
+                    x.Components = null;
+                    x.Embed = scoresEmbed.Build();
+                });
             }
         }
     }

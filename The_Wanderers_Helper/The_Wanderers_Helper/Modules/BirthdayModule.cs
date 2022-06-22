@@ -65,22 +65,28 @@ namespace The_Wanderers_Helper.Modules
         [SlashCommand("list", "List all the birthdays")]
         public async Task List()
         {
+            await DeferAsync();
+
             var config = await _configService.GetServerConfig(Context.Guild.Id);
-            var birthdays = await Task.WhenAll(config.Birthdays.OrderBy(x => x.birthday).Select(async x =>
-            {
-                var username = string.Empty;
-                var guildUser = await Context.Guild.GetUserAsync(x.userId);
-                if (guildUser != null)
+            var birthdays = await Task.WhenAll(config.Birthdays
+                .OrderBy(x => x.birthday.Month)
+                .ThenBy(x => x.birthday.Day)
+                .Select(async x =>
                 {
-                    username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
-                }
-                else
-                {
-                    var user = await Context.Client.GetUserAsync(x.userId);
-                    username = user.Username;
-                }
-                return $"`{x.birthday:dd/MM}`: {username}";
-            }));
+                    var username = string.Empty;
+                    var guildUser = await Context.Guild.GetUserAsync(x.userId);
+                    if (guildUser != null)
+                    {
+                        username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
+                    }
+                    else
+                    {
+                        var user = await Context.Client.GetUserAsync(x.userId);
+                        username = string.IsNullOrEmpty(user?.Username) ? "No user found" : user.Username;
+                    }
+
+                    return $"`{x.birthday:dd/MM}`: {username}";
+                }));
 
             string text = birthdays.Any()
                 ? string.Join(Environment.NewLine, birthdays)

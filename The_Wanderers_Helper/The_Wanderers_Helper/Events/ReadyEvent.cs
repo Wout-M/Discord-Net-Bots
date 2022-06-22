@@ -71,6 +71,8 @@ namespace The_Wanderers_Helper.Events
                 Console.WriteLine(new string('=', server.Name.Length) + "\n");
             }
 
+            Console.WriteLine("Starting birthday checking...");
+
             var jobKey = new JobKey("job1", "group1");
             var trigger = TriggerBuilder.Create()
                 .ForJob(jobKey)

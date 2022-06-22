@@ -33,7 +33,8 @@ namespace The_Wanderers_Helper
             services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Info,
-                MessageCacheSize = 100
+                MessageCacheSize = 100,
+                AlwaysDownloadUsers = true
             }))
             .AddSingleton(s => new InteractionService(s.GetRequiredService<DiscordSocketClient>()))
             //Events

@@ -37,36 +37,5 @@ namespace KGB.Modules
                 x.Embeds = null;
             });
         }
-
-        [ComponentInteraction("words-*")]
-        public async Task Words(string word)
-        {
-            var config = await _configService.GetServerConfig(Context.Guild.Id);
-            var scores = config.Words.First(w => w.word == word).scores.OrderBy(x => x.count).Reverse();
-
-            var scoresEmbed = new EmbedBuilder()
-                .WithTitle($"How much has `{word}` been said in {Context.Guild.Name}")
-                .WithDescription($"`{word}` has been said `{scores.Sum(x => x.count)}` times")
-                .WithFooter("Created by the almighty ginger");
-
-            if (scores.Any())
-            {
-                var usersText = string.Join(Environment.NewLine, scores.Select(s => Context.Guild.GetUser(s.userId).DisplayName));
-                var scoresText = string.Join(Environment.NewLine, scores.Select(s => s.count));
-                scoresEmbed.AddField("Names", usersText, true)
-                           .AddField("Scores", scoresText, true);
-            }
-            else
-            {
-                scoresEmbed.AddField("Scores", "This word hasn't been said yet");
-            }
-
-            await Context.Interaction.UpdateAsync(x =>
-            {
-                x.Content = null;
-                x.Components = null;
-                x.Embed = scoresEmbed.Build();
-            });
-        }
     }
 }

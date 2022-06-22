@@ -67,33 +67,43 @@ namespace KGB.Modules
         [SlashCommand("list", "List all the birthdays")]
         public async Task List()
         {
-            var config = await _configService.GetServerConfig(Context.Guild.Id);
-            var birthdays = await Task.WhenAll(config.Birthdays.OrderBy(x => x.birthday).Select(async x =>
-            {
-                var username = string.Empty;
-                var guildUser = await Context.Guild.GetUserAsync(x.userId);
-                if (guildUser != null)
-                {
-                    username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
-                }
-                else
-                {
-                    var user = await Context.Client.GetUserAsync(x.userId);
-                    username = user.Username;
-                }
-                return $"`{x.birthday:dd/MM}`: {username}";
-            }));
+            await DeferAsync();
 
-            string text = birthdays.Any()
-                ? string.Join(Environment.NewLine, birthdays)
-                : "No birthdays";
+            var config = await _configService.GetServerConfig(Context.Guild.Id);
+            var birthdays = await Task.WhenAll(config.Birthdays
+                .OrderBy(x => x.birthday.Month)
+                .ThenBy(x => x.birthday.Day)
+                .Select(async x =>
+                {
+                    var username = string.Empty;
+                    var guildUser = await Context.Guild.GetUserAsync(x.userId);
+                    if (guildUser != null)
+                    {
+                        username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
+                    }
+                    else
+                    {
+                        var user = await Context.Client.GetUserAsync(x.userId);
+                        username = string.IsNullOrEmpty(user?.Username) ? "No user found" : user.Username;
+                    }
+                    return $"`{x.birthday:dd/MM/yyyy}`: {username}";
+                }));
+
+            var text = birthdays.Any()
+               ? string.Join(Environment.NewLine, birthdays)
+               : "No birthdays";
 
             var embedBuilder = new EmbedBuilder()
                 .WithDescription("Here's a list of everyones birthday")
                 .WithColor(Color.DarkPurple)
                 .AddField("Birthdays", text);
 
-            await RespondAsync(embed: embedBuilder.Build());
+            await ModifyOriginalResponseAsync(x =>
+            {
+                x.Content = null;
+                x.Components = null;
+                x.Embed = embedBuilder.Build();
+            });
         }
 
         [SlashCommand("start", "Start birthday checking")]
