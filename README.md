@@ -72,6 +72,7 @@ There are multiple ways to host Discord bots, as can be found in the [Discord.NE
    ```json
    {
        "Token": "your-bot-token",
+       "OwnerID": 1,
        "Servers": {}
    }
    ```
