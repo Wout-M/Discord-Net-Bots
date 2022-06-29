@@ -34,6 +34,7 @@ There are multiple ways to host Discord bots, as can be found in the [Discord.NE
 
 ### Installation
 0. This is an optional step, but I've first installed [Portainer](https://www.portainer.io/) to easily maintain the different containers and images remotely
+
 1. Make the following folder structure. Make sure to replace `bot-name` with the name of your bot.
    ```
    {bot-name}
@@ -44,12 +45,14 @@ There are multiple ways to host Discord bots, as can be found in the [Discord.NE
    └───logs
        │   {This will contain the possible error logs}
    ```
+   
 2. If you're using one of my bots, clone the branch of your bot in a folder that's also called `bot-name`. Again, replace the name with your own one.
-   - `-b`: Clone a specific branch
-   - `--single-branch`: Clone only the history of this branch. Future fetches will also only look to this branch
    ```sh
    git clone -b {bot-name} --single-branch https://github.com/Wout-M/Discord-Net-Bots {bot-name}
    ```
+   - `-b`: Clone a specific branch
+   - `--single-branch`: Clone only the history of this branch. Future fetches will also only look to this branch
+   
    If you're not using one of my bots, just make sure the DLL's and other build files necessary to run the bot are in said folder. The structure should look something like this:
    ```
    {bot-name}
@@ -68,6 +71,7 @@ There are multiple ways to host Discord bots, as can be found in the [Discord.NE
    COPY ./{bot-name} ./{bot-name}
    ENTRYPOINT ["dotnet", "{bot-name}.dll"]
    ```
+   
 4. Hopefully this step won't be necessary anymore in the future, but for now the bot can't seem to generate a config file by itself from within a container. So, in the `config` folder, create a `config.json` file with the necessary initial configurations. For example for my bots it would be:
    ```json
    {
@@ -89,21 +93,24 @@ There are multiple ways to host Discord bots, as can be found in the [Discord.NE
    └───{bot-name}
        │   {DLL's and other files}
    ```
+   
 5. Create a Docker image for the bot
-    - `-t`: The name of the image
-    - `-f`: The Dockerfile location
    ```sh
    docker build -t {bot-name} -f Dockerfile .
    ```
+    - `-t`: The name of the image
+    - `-f`: The Dockerfile location
+    
 6. Create a container with the newly created image
+   ```sh
+   docker run -d -v $(pwd)/config:/config -v $(pwd)/logs:/logs --name {bot-name} --restart always {bot-name}
+   ```
    - `-d`: Run the container in the background
    - `-v`: Bind a volume on your local environment to a volume on the container. This is used so that the config file and log files are persisted when the container is restarted
    - `--name`: The name of the container
    - `--restart`: Configure the restart policy. I've put it on always so that the container will restart when for example the Pi has been rebooted.
    - `{bot-name}`: The name of the image
-   ```sh
-   docker run -d -v $(pwd)/config:/config -v $(pwd)/logs:/logs --name {bot-name} --restart always {bot-name}
-   ```
+   
 7. Enjoy using your bot!    
 
 ## Roadmap
