@@ -1,26 +1,27 @@
-﻿using Discord.WebSocket;
-using Discord_Bot.Events;
+﻿using Discord.Bots.Core.Events;
+using Discord.WebSocket;
 
-namespace Discord_Bot.Services;
+namespace Discord.Bots.Core.Services;
+
 public class EventService
 {
     private readonly DiscordSocketClient _client;
+    private readonly GuildEvent _guildEvent;
     private readonly InteractionEvent _interactionEvent;
     private readonly MessageEvent _messageEvent;
-    private readonly GuildEvent _guildEvent;
     private readonly ReadyEvent _readyEvent;
 
     public EventService(
         DiscordSocketClient client,
+        GuildEvent guildEvent,
         InteractionEvent interactionEvent,
         MessageEvent messageEvent,
-        GuildEvent guildEvent,
         ReadyEvent readyEvent)
     {
         _client = client;
+        _guildEvent = guildEvent;
         _interactionEvent = interactionEvent;
         _messageEvent = messageEvent;
-        _guildEvent = guildEvent;
         _readyEvent = readyEvent;
     }
 
@@ -31,6 +32,7 @@ public class EventService
 
         _client.MessageUpdated += _messageEvent.MessageUpdated;
         _client.MessageDeleted += _messageEvent.MessageDeleted;
+        _client.MessageReceived += _messageEvent.MessageReceived;
 
         _client.SlashCommandExecuted += _interactionEvent.HandleInteraction;
         _client.ButtonExecuted += _interactionEvent.HandleButtonInteraction;

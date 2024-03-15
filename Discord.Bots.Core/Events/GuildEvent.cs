@@ -1,18 +1,19 @@
-﻿using Discord.WebSocket;
-using Discord_Bot.Config;
-using Discord_Bot.Services;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Discord.Bots.Core.Models;
+using Discord.Bots.Core.Services;
+using Discord.Interactions;
+using Discord.WebSocket;
 
-namespace Discord_Bot.Events;
+namespace Discord.Bots.Core.Events;
+
 public class GuildEvent
 {
     private readonly ConfigService _configService;
+    private readonly InteractionService _interactionService;
 
-    public GuildEvent(ConfigService configService)
+    public GuildEvent(ConfigService configService, InteractionService interactionService)
     {
         _configService = configService;
+        _interactionService = interactionService;
     }
 
     public async Task JoinedGuild(SocketGuild guild)
@@ -24,9 +25,10 @@ public class GuildEvent
             var serverConfig = new ServerConfig()
             {
                 Name = guild.Name,
-                Prefix = config.Prefix
             };
+
             await _configService.AddOrUpdateServerConfig(guild.Id, serverConfig);
+            await _interactionService.RegisterCommandsToGuildAsync(guild.Id);
         }
 
         Console.WriteLine($"Joined {guild.Name} at {DateTime.Now}");

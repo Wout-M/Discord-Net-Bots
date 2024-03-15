@@ -1,34 +1,19 @@
-﻿using Discord;
-using Discord.Interactions;
+﻿using Discord.Interactions;
 using Discord.WebSocket;
-using Discord_Bot.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Discord_Bot.Events;
+namespace Discord.Bots.Core.Events;
+
 public class InteractionEvent
 {
+    private readonly IServiceProvider _provider;
     private readonly DiscordSocketClient _client;
     private readonly InteractionService _commands;
-    private readonly ConfigService _configService;
-    private readonly IServiceProvider _provider;
 
-    public InteractionEvent(
-        DiscordSocketClient client,
-        InteractionService commands,
-        ConfigService configService,
-        IServiceProvider provider)
+    public InteractionEvent(IServiceProvider provider, DiscordSocketClient client, InteractionService commands)
     {
+        _provider = provider;
         _client = client;
         _commands = commands;
-        _configService = configService;
-        _provider = provider;
-
-        _commands.SlashCommandExecuted += SlashCommandExecuted;
-
     }
 
     public async Task SlashCommandExecuted(SlashCommandInfo command, IInteractionContext context, IResult result)

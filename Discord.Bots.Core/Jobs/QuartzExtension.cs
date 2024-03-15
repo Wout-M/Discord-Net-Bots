@@ -2,10 +2,10 @@
 using Quartz;
 using Quartz.Impl;
 
-namespace Discord_Bot.Jobs;
-public static class QuartzExtensions
-{
+namespace Discord.Bots.Core.Jobs;
 
+public static class QuartzExtension
+{
     public static async void AddQuartz(this IServiceCollection services)
     {
 

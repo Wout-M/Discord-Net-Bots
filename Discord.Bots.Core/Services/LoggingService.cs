@@ -1,15 +1,9 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Discord_Bot.Services;
+namespace Discord.Bots.Core.Services;
+
 public class LoggingService
 {
     private string _logDirectory { get; }

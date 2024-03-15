@@ -1,31 +1,27 @@
-﻿using Discord_Bot.Config;
+﻿using Discord.Bots.Core.Models;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Discord_Bot.Services;
+namespace Discord.Bots.Core.Services;
+
 public class ConfigService
 {
-    private readonly string _configName;
+    private readonly string _configPath;
 
     private BotConfig _config;
 
-    public ConfigService(string configName = "config")
+    public ConfigService(string configPath = "../config/config.json")
     {
-        _configName = configName;
+        _configPath = configPath;
     }
 
     public async Task<BotConfig> GetConfig(bool refresh = false)
     {
         if (_config == null || refresh)
         {
-            if (File.Exists($"{_configName}.json"))
+            if (File.Exists(_configPath))
             {
-                _config = JsonConvert.DeserializeObject<BotConfig>(await File.ReadAllTextAsync($"{_configName}.json"));
+                _config = JsonConvert.DeserializeObject<BotConfig>(await File.ReadAllTextAsync(_configPath));
             }
             else
             {
@@ -34,7 +30,6 @@ public class ConfigService
                 _config = new BotConfig();
                 _config.Token = GetProperty<string>("token");
                 _config.OwnerID = GetProperty<ulong>("owner ID");
-                _config.Prefix = GetProperty<string>("prefix");
 
                 await AddOrUpdateConfig(_config);
             }
@@ -69,21 +64,28 @@ public class ConfigService
     public async Task<ServerConfig> GetServerConfig(ulong serverId)
     {
         var config = await GetConfig();
-        return config?.Servers.GetValueOrDefault(serverId);
+        return config.Servers[serverId];
     }
 
     public async Task AddOrUpdateConfig(BotConfig config)
     {
         _config = config;
         string configJSON = JsonConvert.SerializeObject(config);
-        await File.WriteAllTextAsync($"{_configName}.json", configJSON);
+        string configDirectory = Path.GetDirectoryName(_configPath);
+
+        if (!Directory.Exists(configDirectory))
+        {
+            Directory.CreateDirectory(configDirectory);
+        }
+
+        await File.WriteAllTextAsync(_configPath, configJSON);
     }
 
     public async Task AddOrUpdateServerConfig(ulong serverId, ServerConfig serverConfig)
     {
         var config = await GetConfig();
 
-        if (config.Servers.TryGetValue(serverId, out ServerConfig savedConfig))
+        if (config.Servers.TryGetValue(serverId, out _))
         {
             config.Servers[serverId] = serverConfig;
         }

@@ -1,30 +1,18 @@
-﻿using Discord;
-using Discord.Interactions;
-using Discord.WebSocket;
+﻿using Discord.Interactions;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Discord_Bot.Modules;
+namespace Discord.Bots.Core.Modules;
+
 public class FunModule : InteractionModuleBase<InteractionContext>
 {
     private readonly IHttpClientFactory _httpService;
 
-    public FunModule(IHttpClientFactory httpservice)
+    public FunModule(IHttpClientFactory httpClientFactory)
     {
-        _httpService = httpservice;
+        _httpService = httpClientFactory;
     }
 
-
-    [SlashCommand("echo", "Echo an input")]
-    public async Task Echo(string input)
-    {
-        await RespondAsync(input);
-    }
+    #region Hug
 
     [SlashCommand("hug", "Give someone a hug")]
     public async Task Hug([Summary(description: "The person you wanna hug")] IUser user)
@@ -43,6 +31,10 @@ public class FunModule : InteractionModuleBase<InteractionContext>
         }
     }
 
+    #endregion
+
+    #region Cookie
+
     [SlashCommand("cookie", "Give someone a cookie")]
     public async Task Cookie([Summary(description: "The person you wanna give a cookie to")] IUser user)
     {
@@ -52,6 +44,10 @@ public class FunModule : InteractionModuleBase<InteractionContext>
 
         await RespondAsync(text);
     }
+
+    #endregion
+
+    #region Ask
 
     [SlashCommand("ask", "Ask me a question")]
     public async Task Ask(string question)
@@ -78,11 +74,20 @@ public class FunModule : InteractionModuleBase<InteractionContext>
         await RespondAsync($"{answers[new Random().Next(answers.Length)]}");
     }
 
+    #endregion
+
+
+    #region Dice
+
     [SlashCommand("dice", "Roll a dice with <number> sides")]
     public async Task Dice(int number)
     {
         await RespondAsync($"You rolled **{new Random().Next(number + 1)}**");
     }
+
+    #endregion
+
+    #region Quote
 
     [SlashCommand("quote", "Get a quote from InspiroBot")]
     public async Task Quote()
@@ -98,6 +103,10 @@ public class FunModule : InteractionModuleBase<InteractionContext>
             }
         }
     }
+
+    #endregion
+
+    #region Quiz
 
     [SlashCommand("quiz", "Answer a trivia question")]
     public async Task Quiz()
@@ -189,4 +198,6 @@ public class FunModule : InteractionModuleBase<InteractionContext>
         [JsonProperty("results")]
         public List<Result> Results { get; set; }
     }
+
+    #endregion
 }

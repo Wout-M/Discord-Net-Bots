@@ -1,8 +1,8 @@
 ﻿using Quartz;
 using Quartz.Spi;
-using System;
 
-namespace Discord_Bot.Jobs;
+namespace Discord.Bots.Core.Jobs;
+
 public class JobFactory : IJobFactory
 {
     protected readonly IServiceProvider Container;

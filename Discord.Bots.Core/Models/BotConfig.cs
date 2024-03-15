@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
+﻿namespace Discord.Bots.Core.Models;
 
-namespace Discord_Bot.Config;
 public class BotConfig
 {
     public BotConfig()
     {
-        Servers = new Dictionary<ulong, ServerConfig>();
+        Servers = new();
     }
 
     public string Token { get; set; }
     public ulong OwnerID { get; set; }
-    public string Prefix { get; set; }
     public Dictionary<ulong, ServerConfig> Servers { get; set; }
 }

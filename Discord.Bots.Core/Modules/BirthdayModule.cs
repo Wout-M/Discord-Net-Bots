@@ -1,14 +1,11 @@
-﻿using Discord;
+﻿using Discord.Bots.Core.Services;
 using Discord.Interactions;
-using Discord_Bot.Services;
 using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Discord_Bot.Modules;
+namespace Discord.Bots.Core.Modules;
+
+[RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
+[RequireOwner(Group = "Permission")]
 [Group("birthday", "Birthday configurations")]
 public class BirthdayModule : InteractionModuleBase<InteractionContext>
 {
@@ -26,7 +23,7 @@ public class BirthdayModule : InteractionModuleBase<InteractionContext>
     {
         var config = await _configService.GetServerConfig(Context.Guild.Id);
 
-        if (!config.Birthdays.Any(x => x.Item1 == user.Id))
+        if (!config.Birthdays.Any(x => x.userId == user.Id))
         {
             config.Birthdays.Add(new(user.Id, birthday));
             await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
@@ -34,7 +31,7 @@ public class BirthdayModule : InteractionModuleBase<InteractionContext>
         }
         else
         {
-            var bday = config.Birthdays.First(x => x.Item1 == user.Id);
+            var bday = config.Birthdays.First(x => x.userId == user.Id);
             config.Birthdays.Remove(bday);
             bday.Item2 = birthday;
             config.Birthdays.Add(bday);
@@ -48,13 +45,13 @@ public class BirthdayModule : InteractionModuleBase<InteractionContext>
     {
         var config = await _configService.GetServerConfig(Context.Guild.Id);
 
-        if (!config.Birthdays.Any(x => x.Item1 == user.Id))
+        if (!config.Birthdays.Any(x => x.userId == user.Id))
         {
             await RespondAsync($"There is no birthday for `{user.Username}` in the birthday list");
         }
         else
         {
-            var bday = config.Birthdays.First(x => x.Item1 == user.Id);
+            var bday = config.Birthdays.First(x => x.userId == user.Id);
             config.Birthdays.Remove(bday);
             await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
             await RespondAsync($"Successfully removed `{user.Username}`");
@@ -64,33 +61,43 @@ public class BirthdayModule : InteractionModuleBase<InteractionContext>
     [SlashCommand("list", "List all the birthdays")]
     public async Task List()
     {
-        var config = await _configService.GetServerConfig(Context.Guild.Id);
-        var birthdays = await Task.WhenAll(config.Birthdays.OrderBy(x => x.Item2).Select(async x =>
-        {
-            var username = string.Empty;
-            var guildUser = await Context.Guild.GetUserAsync(x.Item1);
-            if (guildUser != null)
-            {
-                username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
-            }
-            else
-            {
-                var user = await Context.Client.GetUserAsync(x.Item1);
-                username = user.Username;
-            }
-            return $"`{x.Item2:dd/MM}`: {username}";
-        }));
+        await DeferAsync();
 
-        string text = birthdays.Any()
-            ? string.Join("\n", birthdays)
-            : "No birthdays";
+        var config = await _configService.GetServerConfig(Context.Guild.Id);
+        var birthdays = await Task.WhenAll(config.Birthdays
+            .OrderBy(x => x.birthday.Month)
+            .ThenBy(x => x.birthday.Day)
+            .Select(async x =>
+            {
+                var username = string.Empty;
+                var guildUser = await Context.Guild.GetUserAsync(x.userId);
+                if (guildUser != null)
+                {
+                    username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
+                }
+                else
+                {
+                    var user = await Context.Client.GetUserAsync(x.userId);
+                    username = string.IsNullOrEmpty(user?.Username) ? "No user found" : user.Username;
+                }
+                return $"`{x.birthday:dd/MM/yyyy}`: {username}";
+            }));
+
+        var text = birthdays.Any()
+           ? string.Join(Environment.NewLine, birthdays)
+           : "No birthdays";
 
         var embedBuilder = new EmbedBuilder()
             .WithDescription("Here's a list of everyones birthday")
             .WithColor(Color.DarkPurple)
             .AddField("Birthdays", text);
 
-        await RespondAsync(embed: embedBuilder.Build());
+        await ModifyOriginalResponseAsync(x =>
+        {
+            x.Content = null;
+            x.Components = null;
+            x.Embed = embedBuilder.Build();
+        });
     }
 
     [SlashCommand("start", "Start birthday checking")]

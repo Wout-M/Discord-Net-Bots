@@ -1,14 +1,11 @@
-﻿using Discord;
+﻿using Discord.Bots.Core.Services;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Discord_Bot.Services;
 using Quartz;
-using System;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
-namespace Discord_Bot.Events;
+namespace Discord.Bots.Core.Events;
+
 public class ReadyEvent
 {
     private readonly IServiceProvider _provider;
@@ -31,17 +28,15 @@ public class ReadyEvent
 
     public async Task Ready()
     {
-        await _client.SetGameAsync("to see if everyone behaves", type: Discord.ActivityType.Watching);
-        await _client.SetStatusAsync(Discord.UserStatus.DoNotDisturb);
-
+        await _client.SetGameAsync("to see if everyone behaves", type: ActivityType.Watching);
+        await _client.SetStatusAsync(UserStatus.DoNotDisturb);
 
         var interactions = new InteractionService(_client, new InteractionServiceConfig()
         {
             LogLevel = LogSeverity.Info,
-            DefaultRunMode = Discord.Interactions.RunMode.Async
+            DefaultRunMode = RunMode.Async
         });
         await interactions.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
-
 
         var config = await _configService.GetConfig();
 
@@ -54,7 +49,7 @@ public class ReadyEvent
             Console.WriteLine(server.Name);
             Console.WriteLine(new string('=', server.Name.Length));
 
-            if (server.ModChannelID.HasValue)
+            if (server.ModChannel.HasValue)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Mod channel configured");
@@ -65,12 +60,25 @@ public class ReadyEvent
                 Console.WriteLine("Add a mod channel");
             }
 
+            if (server.LogChannel.HasValue)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Log channel configured");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Add a log channel");
+            }
+
             Console.ResetColor();
             Console.WriteLine("Register interactions...");
             await interactions.RegisterCommandsToGuildAsync(serverConfig.Key);
 
             Console.WriteLine(new string('=', server.Name.Length) + "\n");
         }
+
+        Console.WriteLine("Starting birthday checking...");
 
         var jobKey = new JobKey("job1", "group1");
         var trigger = TriggerBuilder.Create()
