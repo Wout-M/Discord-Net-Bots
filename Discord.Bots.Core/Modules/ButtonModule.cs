@@ -36,4 +36,38 @@ public class ButtonModule : InteractionModuleBase<SocketInteractionContext<Socke
             x.Embeds = null;
         });
     }
+
+
+    [ComponentInteraction("sortrole-*")]
+    public async Task Sort(string id)
+    {
+        if (!ulong.TryParse(id, out ulong roleId))
+        {
+            await RespondAsync("Something went wrong with the role id, please contact one of the admins", ephemeral: true);
+            return;
+        }
+        if (Context.User is not IGuildUser user)
+        {
+            await RespondAsync("Something went wrong with the user convertion, please contact one of the admins", ephemeral: true);
+            return;
+        }
+
+        var config = await _configService.GetServerConfig(Context.Guild.Id);
+        if (Config.Config.AllowSortRoleRemoval && user.RoleIds.Any(r => r == roleId))
+        {
+            await user.RemoveRoleAsync(roleId);
+            await RespondAsync($"{user.Mention}, you already had this role. This role has been removed", ephemeral: true);
+            return;
+        }
+
+        if (!Config.Config.AllowMultipleSortRoles && user.RoleIds.Any(r => config.SortRoles.Contains(r)))
+        {
+            await RespondAsync($"{user.Mention}, you have already been sorted. If you wish to change your guild, please contact one of the wardens", ephemeral: true);
+            return;
+        }
+
+        var role = Context.Guild.GetRole(roleId);
+        await user.AddRoleAsync(roleId);
+        await RespondAsync($"{user.Mention}, you have been successfully sorted into {role.Mention}", ephemeral: true);
+    }
 }

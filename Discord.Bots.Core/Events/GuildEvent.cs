@@ -22,13 +22,13 @@ public class GuildEvent
 
         if (!config.Servers.Keys.Contains(guild.Id))
         {
-            var serverConfig = new ServerConfig()
+            var serverConfig = new Server()
             {
                 Name = guild.Name,
             };
 
             await _configService.AddOrUpdateServerConfig(guild.Id, serverConfig);
-            await _interactionService.RegisterCommandsToGuildAsync(guild.Id);
+            //await _interactionService.RegisterCommandsToGuildAsync(guild.Id);
         }
 
         Console.WriteLine($"Joined {guild.Name} at {DateTime.Now}");

@@ -1,6 +1,5 @@
 ﻿using Discord.Interactions;
 using Discord.WebSocket;
-using System.Reflection;
 
 namespace Discord.Bots.Core.Services;
 

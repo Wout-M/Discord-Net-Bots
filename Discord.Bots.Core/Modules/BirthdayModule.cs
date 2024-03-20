@@ -80,7 +80,7 @@ public class BirthdayModule : InteractionModuleBase<InteractionContext>
                     var user = await Context.Client.GetUserAsync(x.userId);
                     username = string.IsNullOrEmpty(user?.Username) ? "No user found" : user.Username;
                 }
-                return $"`{x.birthday:dd/MM/yyyy}`: {username}";
+                return $"`{x.birthday.ToString(Config.Config.ShowAge ? "dd/MM" : "dd/MM/yyyy")}: {username}";
             }));
 
         var text = birthdays.Any()

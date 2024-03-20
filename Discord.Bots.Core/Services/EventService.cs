@@ -30,9 +30,16 @@ public class EventService
         _client.Ready += _readyEvent.Ready;
         _client.JoinedGuild += _guildEvent.JoinedGuild;
 
-        _client.MessageUpdated += _messageEvent.MessageUpdated;
-        _client.MessageDeleted += _messageEvent.MessageDeleted;
-        _client.MessageReceived += _messageEvent.MessageReceived;
+        if (Config.Config.UseMessageLogging)
+        {
+            _client.MessageUpdated += _messageEvent.MessageUpdated;
+            _client.MessageDeleted += _messageEvent.MessageDeleted;
+        }
+
+        if (Config.Config.UseWordsChecking)
+        {
+            _client.MessageReceived += _messageEvent.MessageReceived;
+        }
 
         _client.SlashCommandExecuted += _interactionEvent.HandleInteraction;
         _client.ButtonExecuted += _interactionEvent.HandleButtonInteraction;

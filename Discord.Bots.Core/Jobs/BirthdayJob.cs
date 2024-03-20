@@ -54,10 +54,11 @@ public class BirthdayJob : IJob
                     {
                         try
                         {
+                            var ageMessage = $" They'll turn {today.Year - birthday.birthday.Year} years old.";
                             await guild.CreateEventAsync(name: $"{user.Username}'s birthday",
                                                          startTime: new DateTimeOffset(today.AddTicks(difference.Ticks)),
                                                          type: GuildScheduledEventType.External,
-                                                         description: $"It's {user.Username}'s birthday. They'll turn {today.Year - birthday.birthday.Year} years old.",
+                                                         description: $"It's {user.Username}'s birthday.{(Config.Config.ShowAge ? ageMessage : string.Empty)}",
                                                          endTime: new DateTimeOffset(today.AddDays(1).AddTicks(difference.Ticks)),
                                                          location: "Here");
                         }

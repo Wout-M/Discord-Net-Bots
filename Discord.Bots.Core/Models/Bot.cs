@@ -1,13 +1,13 @@
 ﻿namespace Discord.Bots.Core.Models;
 
-public class BotConfig
+public class Bot
 {
-    public BotConfig()
+    public Bot()
     {
         Servers = new();
     }
 
     public string Token { get; set; }
     public ulong OwnerID { get; set; }
-    public Dictionary<ulong, ServerConfig> Servers { get; set; }
+    public Dictionary<ulong, Server> Servers { get; set; }
 }

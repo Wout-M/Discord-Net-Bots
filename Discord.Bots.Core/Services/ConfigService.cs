@@ -8,26 +8,26 @@ public class ConfigService
 {
     private readonly string _configPath;
 
-    private BotConfig _config;
+    private Bot _config;
 
     public ConfigService(string configPath = "../config/config.json")
     {
         _configPath = configPath;
     }
 
-    public async Task<BotConfig> GetConfig(bool refresh = false)
+    public async Task<Bot> GetConfig(bool refresh = false)
     {
         if (_config == null || refresh)
         {
             if (File.Exists(_configPath))
             {
-                _config = JsonConvert.DeserializeObject<BotConfig>(await File.ReadAllTextAsync(_configPath));
+                _config = JsonConvert.DeserializeObject<Bot>(await File.ReadAllTextAsync(_configPath));
             }
             else
             {
                 Console.WriteLine("No config found. Please configure the bot.");
 
-                _config = new BotConfig();
+                _config = new Bot();
                 _config.Token = GetProperty<string>("token");
                 _config.OwnerID = GetProperty<ulong>("owner ID");
 
@@ -61,13 +61,13 @@ public class ConfigService
         return valid;
     }
 
-    public async Task<ServerConfig> GetServerConfig(ulong serverId)
+    public async Task<Server> GetServerConfig(ulong serverId)
     {
         var config = await GetConfig();
         return config.Servers[serverId];
     }
 
-    public async Task AddOrUpdateConfig(BotConfig config)
+    public async Task AddOrUpdateConfig(Bot config)
     {
         _config = config;
         string configJSON = JsonConvert.SerializeObject(config);
@@ -81,7 +81,7 @@ public class ConfigService
         await File.WriteAllTextAsync(_configPath, configJSON);
     }
 
-    public async Task AddOrUpdateServerConfig(ulong serverId, ServerConfig serverConfig)
+    public async Task AddOrUpdateServerConfig(ulong serverId, Server serverConfig)
     {
         var config = await GetConfig();
 

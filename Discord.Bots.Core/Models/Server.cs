@@ -1,8 +1,8 @@
 ﻿namespace Discord.Bots.Core.Models;
 
-public class ServerConfig
+public class Server
 {
-    public ServerConfig()
+    public Server()
     {
         Birthdays = new();
         Words = new();
@@ -14,4 +14,5 @@ public class ServerConfig
     public bool EnableBirthdayChecking { get; set; }
     public List<(string word, List<(ulong userId, int count)> scores)> Words { get; set; }
     public List<(ulong userId, DateTime birthday)> Birthdays { get; set; }
+    public List<ulong> SortRoles { get; set; }
 }

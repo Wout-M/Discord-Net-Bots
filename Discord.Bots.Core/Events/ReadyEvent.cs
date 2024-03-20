@@ -28,7 +28,7 @@ public class ReadyEvent
 
     public async Task Ready()
     {
-        await _client.SetGameAsync("to see if everyone behaves", type: ActivityType.Watching);
+        await _client.SetGameAsync(Config.Config.ActivityMessage, type: Config.Config.ActivityType);
         await _client.SetStatusAsync(UserStatus.DoNotDisturb);
 
         var interactions = new InteractionService(_client, new InteractionServiceConfig()
@@ -78,27 +78,30 @@ public class ReadyEvent
             Console.WriteLine(new string('=', server.Name.Length) + "\n");
         }
 
-        Console.WriteLine("Starting birthday checking...");
-
-        var jobKey = new JobKey("job1", "group1");
-        var trigger = TriggerBuilder.Create()
-            .ForJob(jobKey)
-            .WithIdentity("trigger1", "group1")
-            .StartNow()
-            .WithSimpleSchedule(x => x
-                .WithIntervalInSeconds(10)
-                .RepeatForever())
-            .Build();
-
-        var triggers = await _scheduler.GetTriggersOfJob(jobKey);
-        if (!triggers.Any())
+        if (Config.Config.UseBirthdayChecking)
         {
-            await _scheduler.ScheduleJob(trigger);
-            Console.WriteLine("Started checking for birthdays");
-        }
-        else
-        {
-            Console.WriteLine("Birthday checking is already running");
+            Console.WriteLine("Starting birthday checking...");
+
+            var jobKey = new JobKey("job1", "group1");
+            var trigger = TriggerBuilder.Create()
+                .ForJob(jobKey)
+                .WithIdentity("trigger1", "group1")
+                .StartNow()
+                .WithSimpleSchedule(x => x
+                    .WithIntervalInSeconds(10)
+                    .RepeatForever())
+                .Build();
+
+            var triggers = await _scheduler.GetTriggersOfJob(jobKey);
+            if (!triggers.Any())
+            {
+                await _scheduler.ScheduleJob(trigger);
+                Console.WriteLine("Started checking for birthdays");
+            }
+            else
+            {
+                Console.WriteLine("Birthday checking is already running");
+            }
         }
     }
 }

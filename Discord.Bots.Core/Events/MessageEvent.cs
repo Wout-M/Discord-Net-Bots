@@ -17,6 +17,7 @@ public class MessageEvent
 
     public async Task MessageReceived(SocketMessage message)
     {
+        if (!Config.Config.UseWordsChecking) return;
         if (message.Channel is not IGuildChannel guildChannel) return;
         if (message.Author.IsBot || message.Author.IsWebhook) return;
 
@@ -59,6 +60,7 @@ public class MessageEvent
 
     public async Task MessageUpdated(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel channel)
     {
+        if (!Config.Config.UseMessageLogging) return;
         if (channel is not IGuildChannel guildChannel) return;
         if (after.Author.IsBot || after.Author.IsWebhook) return;
 
@@ -81,6 +83,8 @@ public class MessageEvent
 
     public async Task MessageDeleted(Cacheable<IMessage, ulong> deleted, Cacheable<IMessageChannel, ulong> cachedChannel)
     {
+        if (!Config.Config.UseMessageLogging) return;
+
         var channel = await cachedChannel.GetOrDownloadAsync();
         if (channel is not IGuildChannel guildChannel) return;
 
@@ -106,7 +110,7 @@ public class MessageEvent
     {
         var config = await _configService.GetConfig();
 
-        if (config.Servers.TryGetValue(guildChannel.GuildId, out ServerConfig serverConfig) && serverConfig.LogChannel.HasValue)
+        if (config.Servers.TryGetValue(guildChannel.GuildId, out Server serverConfig) && serverConfig.LogChannel.HasValue)
         {
             var logChannel = await guildChannel.Guild.GetTextChannelAsync(serverConfig.LogChannel.Value);
             await logChannel?.SendMessageAsync(embed: embed);
