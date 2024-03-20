@@ -5,16 +5,10 @@ using Discord.WebSocket;
 
 namespace Discord.Bots.Core.Events;
 
-public class GuildEvent
+public class GuildEvent(ConfigService configService, InteractionService interactionService)
 {
-    private readonly ConfigService _configService;
-    private readonly InteractionService _interactionService;
-
-    public GuildEvent(ConfigService configService, InteractionService interactionService)
-    {
-        _configService = configService;
-        _interactionService = interactionService;
-    }
+    private readonly ConfigService _configService = configService;
+    private readonly InteractionService _interactionService = interactionService;
 
     public async Task JoinedGuild(SocketGuild guild)
     {

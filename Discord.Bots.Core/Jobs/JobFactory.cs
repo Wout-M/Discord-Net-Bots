@@ -14,7 +14,8 @@ public class JobFactory : IJobFactory
 
     public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
     {
-        return Container.GetService(bundle.JobDetail.JobType) as IJob;
+        if (Container.GetService(bundle.JobDetail.JobType) is not IJob job) { throw new Exception("Job not found"); }
+        return job;
     }
 
     public void ReturnJob(IJob job)

@@ -4,16 +4,11 @@ using System.ComponentModel;
 
 namespace Discord.Bots.Core.Services;
 
-public class ConfigService
+public class ConfigService(string configPath = "../config/config.json")
 {
-    private readonly string _configPath;
+    private readonly string _configPath = configPath;
 
-    private Bot _config;
-
-    public ConfigService(string configPath = "../config/config.json")
-    {
-        _configPath = configPath;
-    }
+    private Bot? _config;
 
     public async Task<Bot> GetConfig(bool refresh = false)
     {
@@ -21,43 +16,44 @@ public class ConfigService
         {
             if (File.Exists(_configPath))
             {
-                _config = JsonConvert.DeserializeObject<Bot>(await File.ReadAllTextAsync(_configPath));
+                _config = JsonConvert.DeserializeObject<Bot>(await File.ReadAllTextAsync(_configPath))!;
             }
             else
             {
                 Console.WriteLine("No config found. Please configure the bot.");
 
-                _config = new Bot();
+                _config = new Bot() { Token = string.Empty };
                 _config.Token = GetProperty<string>("token");
                 _config.OwnerID = GetProperty<ulong>("owner ID");
 
                 await AddOrUpdateConfig(_config);
             }
         }
+
         return _config;
     }
 
-    private T GetProperty<T>(string name)
+    private static T GetProperty<T>(string name)
     {
         T result;
-        Console.Write($"{name.First().ToString().ToUpper()}{name.Substring(1)}: ");
+        Console.Write($"{name.First().ToString().ToUpper()}{name[1..]}: ");
         var property = Console.ReadLine();
 
-        while (string.IsNullOrEmpty(property) || !ConvertProperty<T>(property, out result))
+        while (string.IsNullOrEmpty(property) || !ConvertProperty(property, out result))
         {
             Console.WriteLine($"Please fill in a valid {name}");
-            Console.Write($"{name.First().ToString().ToUpper()}{name.Substring(1)}: ");
+            Console.Write($"{name.First().ToString().ToUpper()}{name[1..]}: ");
             property = Console.ReadLine();
         }
 
         return result;
     }
 
-    private bool ConvertProperty<T>(string property, out T convertedProperty)
+    private static bool ConvertProperty<T>(string property, out T convertedProperty)
     {
         var converter = TypeDescriptor.GetConverter(typeof(T));
-        bool valid = converter != null && converter.IsValid(property);
-        convertedProperty = valid ? (T)converter.ConvertFromString(property) : default(T);
+        var valid = converter != null && converter.IsValid(property);
+        convertedProperty = valid && converter!.ConvertFromString(property) is T prop ? prop  : default!;
         return valid;
     }
 
@@ -70,10 +66,10 @@ public class ConfigService
     public async Task AddOrUpdateConfig(Bot config)
     {
         _config = config;
-        string configJSON = JsonConvert.SerializeObject(config);
-        string configDirectory = Path.GetDirectoryName(_configPath);
+        var configJSON = JsonConvert.SerializeObject(config);
+        var configDirectory = Path.GetDirectoryName(_configPath);
 
-        if (!Directory.Exists(configDirectory))
+        if (!string.IsNullOrEmpty(configDirectory) && !Directory.Exists(configDirectory))
         {
             Directory.CreateDirectory(configDirectory);
         }

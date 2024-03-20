@@ -7,16 +7,10 @@ namespace Discord.Bots.Core.Modules;
 [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
 [RequireOwner(Group = "Permission")]
 [Group("birthday", "Birthday configurations")]
-public class BirthdayModule : InteractionModuleBase<InteractionContext>
+public class BirthdayModule(ConfigService configService, IScheduler scheduler) : InteractionModuleBase<InteractionContext>
 {
-    private readonly ConfigService _configService;
-    private readonly IScheduler _scheduler;
-
-    public BirthdayModule(ConfigService configService, IScheduler scheduler)
-    {
-        _configService = configService;
-        _scheduler = scheduler;
-    }
+    private readonly ConfigService _configService = configService;
+    private readonly IScheduler _scheduler = scheduler;
 
     [SlashCommand("add", "Add a new birthday")]
     public async Task Add([Summary("User", "The birthday person")] IUser user, DateTime birthday)
@@ -33,7 +27,7 @@ public class BirthdayModule : InteractionModuleBase<InteractionContext>
         {
             var bday = config.Birthdays.First(x => x.userId == user.Id);
             config.Birthdays.Remove(bday);
-            bday.Item2 = birthday;
+            bday.birthday = birthday;
             config.Birthdays.Add(bday);
             await _configService.AddOrUpdateServerConfig(Context.Guild.Id, config);
             await RespondAsync($"Successfully updated `{user.Username}` ({birthday:dd/MM/yyyy})");

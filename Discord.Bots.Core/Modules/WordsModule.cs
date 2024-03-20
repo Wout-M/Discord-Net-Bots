@@ -4,14 +4,9 @@ using Discord.Interactions;
 namespace Discord.Bots.Core.Modules;
 
 [Group("words", "Counting words")]
-public class WordsModule : InteractionModuleBase<InteractionContext>
+public class WordsModule(ConfigService configService) : InteractionModuleBase<InteractionContext>
 {
-    private readonly ConfigService _configService;
-
-    public WordsModule(ConfigService configService)
-    {
-        _configService = configService;
-    }
+    private readonly ConfigService _configService = configService;
 
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
     [RequireOwner(Group = "Permission")]

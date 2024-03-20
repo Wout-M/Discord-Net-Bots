@@ -1,34 +1,25 @@
-﻿using Discord.Interactions;
+﻿using Discord.Bots.Core.Models;
+using Discord.Interactions;
 using Newtonsoft.Json;
 
 namespace Discord.Bots.Core.Modules;
 
-public class FunModule : InteractionModuleBase<InteractionContext>
+public class FunModule(IHttpClientFactory httpClientFactory) : InteractionModuleBase<InteractionContext>
 {
-    private readonly IHttpClientFactory _httpService;
-
-    public FunModule(IHttpClientFactory httpClientFactory)
-    {
-        _httpService = httpClientFactory;
-    }
+    private readonly IHttpClientFactory _httpService = httpClientFactory;
 
     #region Hug
 
     [SlashCommand("hug", "Give someone a hug")]
     public async Task Hug([Summary(description: "The person you wanna hug")] IUser user)
     {
-        using (var http = _httpService.CreateClient())
-        {
+        using var http = _httpService.CreateClient();
+        string text = Context.User.Id == user.Id
+              ? $"{Context.User.Mention} gave themselves a hug"
+              : $"{user.Mention}, {Context.User.Mention} gave you a hug";
 
-            string text = Context.User.Id == user.Id
-                  ? $"{Context.User.Mention} gave themselves a hug"
-                  : $"{user.Mention}, {Context.User.Mention} gave you a hug";
-
-            using (var stream = await http.GetStreamAsync("https://media.giphy.com/media/RPyUPymjO4YJa/giphy.gif"))
-            {
-                await RespondWithFileAsync(stream, "giphy.gif", text: text);
-            }
-        }
+        using var stream = await http.GetStreamAsync("https://media.giphy.com/media/RPyUPymjO4YJa/giphy.gif");
+        await RespondWithFileAsync(stream, "giphy.gif", text: text);
     }
 
     #endregion
@@ -52,7 +43,7 @@ public class FunModule : InteractionModuleBase<InteractionContext>
     [SlashCommand("ask", "Ask me a question")]
     public async Task Ask(string question)
     {
-        string[] answers = new string[]
+        var answers = new string[]
         {
             "Yes",
             "No",
@@ -92,16 +83,12 @@ public class FunModule : InteractionModuleBase<InteractionContext>
     [SlashCommand("quote", "Get a quote from InspiroBot")]
     public async Task Quote()
     {
-        using (var http = _httpService.CreateClient())
-        {
-            var quoteRequest = await http.GetAsync("https://inspirobot.me/api?generate=true");
-            string imageURL = await quoteRequest.Content.ReadAsStringAsync();
+        using var http = _httpService.CreateClient();
+        var quoteRequest = await http.GetAsync("https://inspirobot.me/api?generate=true");
+        string imageURL = await quoteRequest.Content.ReadAsStringAsync();
 
-            using (var stream = await http.GetStreamAsync(imageURL))
-            {
-                await RespondWithFileAsync(stream, "quote.jpg");
-            }
-        }
+        using var stream = await http.GetStreamAsync(imageURL);
+        await RespondWithFileAsync(stream, "quote.jpg");
     }
 
     #endregion
@@ -111,47 +98,50 @@ public class FunModule : InteractionModuleBase<InteractionContext>
     [SlashCommand("quiz", "Answer a trivia question")]
     public async Task Quiz()
     {
-        using (var http = _httpService.CreateClient())
+        using var http = _httpService.CreateClient();
+        var quizRequest = await http.GetAsync("https://opentdb.com/api.php?amount=1&type=multiple");
+        var quizResponse = await quizRequest.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<Response>(quizResponse)?.Results?.First();
+        if (result == null || result.IncorrectAnswers == null || string.IsNullOrEmpty(result.CorrectAnswer) || string.IsNullOrEmpty(result.Question))
         {
-            var quizRequest = await http.GetAsync("https://opentdb.com/api.php?amount=1&type=multiple");
-            string quizResponse = await quizRequest.Content.ReadAsStringAsync();
-            Result result = JsonConvert.DeserializeObject<Response>(quizResponse).Results.First();
+            await Context.Interaction.RespondAsync("Something went wrong while fetching the question");
+            return;
+        }
 
-            List<Tuple<bool, string>> answers = result.IncorrectAnswers.Select(answer => new Tuple<bool, string>(false, answer)).ToList();
-            answers.Insert(new Random().Next(answers.Count), new Tuple<bool, string>(true, result.CorrectAnswer));
+       var answers = result.IncorrectAnswers.Select<string, (bool correct, string answer)>(answer => (false, answer)).ToList();
+        answers.Insert(new Random().Next(answers.Count), (true, result.CorrectAnswer));
 
-            var quizEmbed = new EmbedBuilder()
-                .WithAuthor(Context.Client.CurrentUser)
-                .WithTitle(CleanText(result.Question))
-                .WithColor(Color.Gold)
-                .WithFooter("You have 20 seconds to answer")
-                .AddField("Category", result.Category, true)
-                .AddField("Difficulty", result.Difficulty, true);
+        var quizEmbed = new EmbedBuilder()
+            .WithAuthor(Context.Client.CurrentUser)
+            .WithTitle(CleanText(result.Question))
+            .WithColor(Color.Gold)
+            .WithFooter("You have 20 seconds to answer")
+            .AddField("Category", result.Category, true)
+            .AddField("Difficulty", result.Difficulty, true);
 
-            var component = new ComponentBuilder();
-            for (int i = 0; i < answers.Count; i++)
+        var component = new ComponentBuilder();
+        for (int i = 0; i < answers.Count; i++)
+        {
+            var button = new ButtonBuilder()
             {
-                var button = new ButtonBuilder()
-                {
-                    Label = CleanText(answers[i].Item2),
-                    CustomId = PrepareText($"quiz_{(answers[i].Item1 ? 1 : 0)}_{CleanText(answers[i].Item2)}"),
-                    Style = (ButtonStyle)(i + 1),
-                };
-                component.WithButton(button);
-            }
+                Label = CleanText(answers[i].answer),
+                CustomId = PrepareText($"quiz_{(answers[i].correct ? 1 : 0)}_{CleanText(answers[i].answer)}"),
+                Style = (ButtonStyle)(i + 1),
+            };
+            component.WithButton(button);
+        }
 
-            await Context.Interaction.RespondAsync(components: component.Build(), embed: quizEmbed.Build());
+        await Context.Interaction.RespondAsync(components: component.Build(), embed: quizEmbed.Build());
 
-            await Task.Delay(20000);
-            var response = await Context.Interaction.GetOriginalResponseAsync();
-            if (response.Embeds.Any())
-            {
-                await response.DeleteAsync();
-            }
+        await Task.Delay(20000);
+        var response = await Context.Interaction.GetOriginalResponseAsync();
+        if (response.Embeds.Any())
+        {
+            await response.DeleteAsync();
         }
     }
 
-    public string CleanText(string text)
+    public static string CleanText(string text)
     {
         return text
             .Replace("&quot;", "\"")
@@ -160,43 +150,13 @@ public class FunModule : InteractionModuleBase<InteractionContext>
             .Replace("&ouml;", "ö");
     }
 
-    public string PrepareText(string text)
+    public static string PrepareText(string text)
     {
         text = text.Replace(" ", "|");
 
         if (text.Length < 100) return text;
 
-        return $"{text.Substring(0, 96)}...";
-    }
-
-    public class Result
-    {
-        [JsonProperty("category")]
-        public string Category { get; set; }
-
-        [JsonProperty("type")]
-        public string Type { get; set; }
-
-        [JsonProperty("difficulty")]
-        public string Difficulty { get; set; }
-
-        [JsonProperty("question")]
-        public string Question { get; set; }
-
-        [JsonProperty("correct_answer")]
-        public string CorrectAnswer { get; set; }
-
-        [JsonProperty("incorrect_answers")]
-        public List<string> IncorrectAnswers { get; set; }
-    }
-
-    public class Response
-    {
-        [JsonProperty("response_code")]
-        public int ResponseCode { get; set; }
-
-        [JsonProperty("results")]
-        public List<Result> Results { get; set; }
+        return $"{text[..96]}...";
     }
 
     #endregion

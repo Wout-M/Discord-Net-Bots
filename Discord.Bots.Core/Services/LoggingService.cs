@@ -7,7 +7,7 @@ namespace Discord.Bots.Core.Services;
 public class LoggingService
 {
     private string _logDirectory { get; }
-    private string _logFile => Path.Combine(_logDirectory, $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.txt");
+    private string _logFile => Path.Combine(_logDirectory, $"{DateTime.UtcNow:yyyy-MM-dd}.txt");
 
     public LoggingService(DiscordSocketClient client, InteractionService command)
     {
@@ -20,7 +20,7 @@ public class LoggingService
     private Task LogAsync(LogMessage message)
     {
         string text = message.Exception is CommandException cmdException
-            ? $"[Command/{message.Severity}] {cmdException.Command.Aliases.First()} failed to execute in {cmdException.Context.Channel}: {cmdException}"
+            ? $"[Command/{message.Severity}] {cmdException.Command.Aliases[0]} failed to execute in {cmdException.Context.Channel}: {cmdException}"
             : $"[General/{message.Severity}] {message}";
 
         if (message.Severity == LogSeverity.Error || message.Severity == LogSeverity.Critical)

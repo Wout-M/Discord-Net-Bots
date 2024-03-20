@@ -5,16 +5,10 @@ using Quartz;
 namespace Discord.Bots.Core.Jobs;
 
 [DisallowConcurrentExecution]
-public class BirthdayJob : IJob
+public class BirthdayJob(ConfigService configService, DiscordSocketClient client) : IJob
 {
-    private readonly ConfigService _configService;
-    private readonly DiscordSocketClient _client;
-
-    public BirthdayJob(ConfigService configService, DiscordSocketClient client)
-    {
-        _configService = configService;
-        _client = client;
-    }
+    private readonly ConfigService _configService = configService;
+    private readonly DiscordSocketClient _client = client;
 
     public async Task Execute(IJobExecutionContext context)
     {

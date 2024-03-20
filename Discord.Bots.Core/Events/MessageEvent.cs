@@ -4,16 +4,10 @@ using Discord.WebSocket;
 
 namespace Discord.Bots.Core.Events;
 
-public class MessageEvent
+public class MessageEvent(DiscordSocketClient client, ConfigService configService)
 {
-    private readonly DiscordSocketClient _client;
-    private readonly ConfigService _configService;
-
-    public MessageEvent(DiscordSocketClient client, ConfigService configService)
-    {
-        _client = client;
-        _configService = configService;
-    }
+    private readonly DiscordSocketClient _client = client;
+    private readonly ConfigService _configService = configService;
 
     public async Task MessageReceived(SocketMessage message)
     {
@@ -87,22 +81,23 @@ public class MessageEvent
 
         var channel = await cachedChannel.GetOrDownloadAsync();
         if (channel is not IGuildChannel guildChannel) return;
+        if (channel is not ISocketMessageChannel socketMessageChannel) return;
 
         if (deleted.HasValue)
         {
             if (deleted.Value.Author.IsBot || deleted.Value.Author.IsWebhook) return;
             var embed = new EmbedBuilder()
-           .AddField("Deleted", deleted.Value.Timestamp.DateTime.ToString("G"))
-           .AddField("Author", deleted.Value.Author.ToString())
-           .AddField("Channel", channel.Name, true)
-           .AddField("Message", deleted.Value.Content.Length > 1024 ? "This message is too long" : deleted.Value.Content)
-           .WithTitle("Message deleted")
-           .WithColor(Color.DarkRed)
-           .WithFooter(footer => footer.Text = "Created by the almighty ginger")
-           .WithAuthor(_client.CurrentUser)
-           .WithCurrentTimestamp();
+                .AddField("Deleted", deleted.Value.Timestamp.DateTime.ToString("G"))
+               .AddField("Author", deleted.Value.Author.ToString())
+               .AddField("Channel", channel.Name, true)
+               .AddField("Message", deleted.Value.Content.Length > 1024 ? "This message is too long" : deleted.Value.Content)
+               .WithTitle("Message deleted")
+               .WithColor(Color.DarkRed)
+               .WithFooter(footer => footer.Text = "Created by the almighty ginger")
+               .WithAuthor(_client.CurrentUser)
+               .WithCurrentTimestamp();
 
-            await SendLogEmbed(embed.Build(), channel as ISocketMessageChannel, guildChannel);
+            await SendLogEmbed(embed.Build(), socketMessageChannel, guildChannel);
         }
     }
 
@@ -110,10 +105,10 @@ public class MessageEvent
     {
         var config = await _configService.GetConfig();
 
-        if (config.Servers.TryGetValue(guildChannel.GuildId, out Server serverConfig) && serverConfig.LogChannel.HasValue)
+        if (config.Servers.TryGetValue(guildChannel.GuildId, out var serverConfig) && serverConfig.LogChannel.HasValue)
         {
             var logChannel = await guildChannel.Guild.GetTextChannelAsync(serverConfig.LogChannel.Value);
-            await logChannel?.SendMessageAsync(embed: embed);
+            await logChannel.SendMessageAsync(embed: embed);
         }
         else
         {

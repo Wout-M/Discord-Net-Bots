@@ -6,25 +6,16 @@ using System.Reflection;
 
 namespace Discord.Bots.Core.Events;
 
-public class ReadyEvent
+public class ReadyEvent(
+    IServiceProvider provider,
+    IScheduler scheduler,
+    DiscordSocketClient client,
+    ConfigService configService)
 {
-    private readonly IServiceProvider _provider;
-    private readonly IScheduler _scheduler;
-    private readonly DiscordSocketClient _client;
-    private readonly ConfigService _configService;
-
-    public ReadyEvent(
-        IServiceProvider provider,
-        IScheduler scheduler,
-        DiscordSocketClient client,
-        ConfigService configService)
-    {
-        _provider = provider;
-        _scheduler = scheduler;
-        _client = client;
-        _configService = configService;
-    }
-
+    private readonly IServiceProvider _provider = provider;
+    private readonly IScheduler _scheduler = scheduler;
+    private readonly DiscordSocketClient _client = client;
+    private readonly ConfigService _configService = configService;
 
     public async Task Ready()
     {

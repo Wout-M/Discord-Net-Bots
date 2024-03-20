@@ -3,20 +3,13 @@ using Discord.WebSocket;
 
 namespace Discord.Bots.Core.Events;
 
-public class InteractionEvent
+public class InteractionEvent(IServiceProvider provider, DiscordSocketClient client, InteractionService commands)
 {
-    private readonly IServiceProvider _provider;
-    private readonly DiscordSocketClient _client;
-    private readonly InteractionService _commands;
+    private readonly IServiceProvider _provider = provider;
+    private readonly DiscordSocketClient _client = client;
+    private readonly InteractionService _commands = commands;
 
-    public InteractionEvent(IServiceProvider provider, DiscordSocketClient client, InteractionService commands)
-    {
-        _provider = provider;
-        _client = client;
-        _commands = commands;
-    }
-
-    public async Task SlashCommandExecuted(SlashCommandInfo command, IInteractionContext context, IResult result)
+    public static async Task SlashCommandExecuted(SlashCommandInfo command, IInteractionContext context, IResult result)
     {
         if (result.Error.HasValue)
         {

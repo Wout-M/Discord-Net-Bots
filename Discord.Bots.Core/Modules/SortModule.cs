@@ -6,14 +6,9 @@ namespace Discord.Bots.Core.Modules
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
     [RequireOwner(Group = "Permission")]
     [Group("sort", "Sorting roles")]
-    public class SortModule : InteractionModuleBase<InteractionContext>
+    public class SortModule(ConfigService configService) : InteractionModuleBase<InteractionContext>
     {
-        private readonly ConfigService _configService;
-
-        public SortModule(ConfigService configService)
-        {
-            _configService = configService;
-        }
+        private readonly ConfigService _configService = configService;
 
         [SlashCommand("add", "Add a new role")]
         public async Task Add([Summary("role", "A role that should be added to the sorting menu")] IRole role)

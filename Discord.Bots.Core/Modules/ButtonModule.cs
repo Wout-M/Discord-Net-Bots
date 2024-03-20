@@ -4,14 +4,9 @@ using Discord.WebSocket;
 
 namespace Discord.Bots.Core.Modules;
 
-public class ButtonModule : InteractionModuleBase<SocketInteractionContext<SocketMessageComponent>>
+public class ButtonModule(ConfigService configService) : InteractionModuleBase<SocketInteractionContext<SocketMessageComponent>>
 {
-    private readonly ConfigService _configService;
-
-    public ButtonModule(ConfigService configService)
-    {
-        _configService = configService;
-    }
+    private readonly ConfigService _configService = configService;
 
     [ComponentInteraction("quiz_*_*")]
     public async Task Quiz(string correct, string answer)

@@ -3,27 +3,18 @@ using Discord.WebSocket;
 
 namespace Discord.Bots.Core.Services;
 
-public class StartupService
+public class StartupService(
+    IServiceProvider provider,
+    DiscordSocketClient client,
+    ConfigService configService,
+    EventService eventService,
+    InteractionService interactions)
 {
-    private readonly IServiceProvider _provider;
-    private readonly DiscordSocketClient _client;
-    private readonly ConfigService _configService;
-    private readonly EventService _eventService;
-    private readonly InteractionService _interactions;
-
-    public StartupService(
-        IServiceProvider provider,
-        DiscordSocketClient client,
-        ConfigService configService,
-        EventService eventService,
-        InteractionService interactions)
-    {
-        _provider = provider;
-        _client = client;
-        _configService = configService;
-        _eventService = eventService;
-        _interactions = interactions;
-    }
+    private readonly IServiceProvider _provider = provider;
+    private readonly DiscordSocketClient _client = client;
+    private readonly ConfigService _configService = configService;
+    private readonly EventService _eventService = eventService;
+    private readonly InteractionService _interactions = interactions;
 
     public async Task StartAsync(Type[] modules)
     {

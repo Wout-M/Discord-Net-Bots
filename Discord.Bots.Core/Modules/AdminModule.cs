@@ -5,14 +5,9 @@ namespace Discord.Bots.Core.Modules;
 
 [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
 [RequireOwner(Group = "Permission")]
-public class AdminModule : InteractionModuleBase<InteractionContext>
+public class AdminModule(ConfigService configService) : InteractionModuleBase<InteractionContext>
 {
-    private readonly ConfigService _configService;
-
-    public AdminModule(ConfigService configService)
-    {
-        _configService = configService;
-    }
+    private readonly ConfigService _configService = configService;
 
     #region ModChannel
 
