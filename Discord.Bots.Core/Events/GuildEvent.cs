@@ -14,7 +14,7 @@ public class GuildEvent(ConfigService configService, InteractionService interact
     {
         var config = await _configService.GetConfig();
 
-        if (!config.Servers.Keys.Contains(guild.Id))
+        if (!config.Servers.ContainsKey(guild.Id))
         {
             var serverConfig = new Server()
             {
@@ -22,7 +22,7 @@ public class GuildEvent(ConfigService configService, InteractionService interact
             };
 
             await _configService.AddOrUpdateServerConfig(guild.Id, serverConfig);
-            //await _interactionService.RegisterCommandsToGuildAsync(guild.Id);
+            await _interactionService.RegisterCommandsToGuildAsync(guild.Id);
         }
 
         Console.WriteLine($"Joined {guild.Name} at {DateTime.Now}");

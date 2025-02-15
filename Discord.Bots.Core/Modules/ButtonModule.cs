@@ -13,8 +13,7 @@ public class ButtonModule(ConfigService configService) : InteractionModuleBase<S
     {
         if (!int.TryParse(correct, out int correctInt))
         {
-
-            await RespondAsync("Something went wrong with the answer button, please contact one of the wardens", ephemeral: true);
+            await RespondAsync("Something went wrong with the answer button, please contact one of the admins", ephemeral: true);
             return;
         }
 
@@ -57,7 +56,7 @@ public class ButtonModule(ConfigService configService) : InteractionModuleBase<S
 
         if (!Config.Config.AllowMultipleSortRoles && user.RoleIds.Any(r => config.SortRoles.Contains(r)))
         {
-            await RespondAsync($"{user.Mention}, you have already been sorted. If you wish to change your guild, please contact one of the wardens", ephemeral: true);
+            await RespondAsync($"{user.Mention}, you have already been sorted. If you wish to change your role, please contact one of the admins", ephemeral: true);
             return;
         }
 

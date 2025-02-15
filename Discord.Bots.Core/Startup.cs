@@ -26,13 +26,22 @@ public static class Startup
     {
         //Client
         services
+              .AddSingleton(s => new InteractionService(s.GetRequiredService<DiscordSocketClient>(), new InteractionServiceConfig()
+              {
+                  LogLevel = LogSeverity.Info,
+                  DefaultRunMode = RunMode.Async,
+              }))
             .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Info,
                 MessageCacheSize = 100,
-                GatewayIntents = GatewayIntents.All
+                GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildBans | GatewayIntents.GuildEmojis |
+                                 GatewayIntents.GuildIntegrations | GatewayIntents.GuildWebhooks | GatewayIntents.GuildVoiceStates |
+                                 GatewayIntents.GuildMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessageTyping | 
+                                 GatewayIntents.DirectMessages | GatewayIntents.DirectMessageReactions | GatewayIntents.DirectMessageTyping | 
+                                 GatewayIntents.AutoModerationConfiguration | GatewayIntents.AutoModerationActionExecution | GatewayIntents.GuildMessagePolls | 
+                                 GatewayIntents.DirectMessagePolls | GatewayIntents.GuildMembers | GatewayIntents.MessageContent, 
             }))
-            .AddSingleton(s => new InteractionService(s.GetRequiredService<DiscordSocketClient>()))
             //Events
             .AddSingleton<GuildEvent>()
             .AddSingleton<MessageEvent>()

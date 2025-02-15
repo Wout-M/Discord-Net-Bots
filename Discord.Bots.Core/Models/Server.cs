@@ -6,7 +6,7 @@ public sealed record Server
     public ulong? ModChannel { get; set; }
     public ulong? LogChannel { get; set; }
     public bool EnableBirthdayChecking { get; set; }
-    public List<(string word, List<(ulong userId, int count)> scores)> Words { get; set; } = new();
-    public List<(ulong userId, DateTime birthday)> Birthdays { get; set; } = new();
-    public List<ulong> SortRoles { get; set; } = new();
+    public List<(string word, List<(ulong userId, int count)> scores)> Words { get; set; } = [];
+    public List<(ulong userId, DateTime birthday)> Birthdays { get; set; } = [];
+    public List<ulong> SortRoles { get; set; } = [];
 }

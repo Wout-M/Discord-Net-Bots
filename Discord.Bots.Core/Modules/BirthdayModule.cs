@@ -67,14 +67,18 @@ public class BirthdayModule(ConfigService configService, IScheduler scheduler) :
                 var guildUser = await Context.Guild.GetUserAsync(x.userId);
                 if (guildUser != null)
                 {
-                    username = string.IsNullOrEmpty(guildUser.Nickname) ? guildUser.Username : guildUser.Nickname;
+                    username = !string.IsNullOrEmpty(guildUser.DisplayName) 
+                    ? guildUser.DisplayName
+                    : !string.IsNullOrEmpty(guildUser.Nickname)
+                        ? guildUser.Nickname
+                        : guildUser.Username;
                 }
                 else
                 {
                     var user = await Context.Client.GetUserAsync(x.userId);
                     username = string.IsNullOrEmpty(user?.Username) ? "No user found" : user.Username;
                 }
-                return $"`{x.birthday.ToString(Config.Config.ShowAge ? "dd/MM" : "dd/MM/yyyy")}: {username}";
+                return $"`{x.birthday.ToString(Config.Config.ShowAge ? "dd/MM/yyyy" : "dd/MM")}`: {username}";
             }));
 
         var text = birthdays.Any()

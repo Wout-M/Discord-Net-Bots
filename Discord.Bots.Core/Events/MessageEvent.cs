@@ -1,5 +1,4 @@
-﻿using Discord.Bots.Core.Models;
-using Discord.Bots.Core.Services;
+﻿using Discord.Bots.Core.Services;
 using Discord.WebSocket;
 
 namespace Discord.Bots.Core.Events;
@@ -21,14 +20,14 @@ public class MessageEvent(DiscordSocketClient client, ConfigService configServic
         var words = message.CleanContent.ToLower().Split(' ');
         var scoresUpdated = false;
 
-        foreach (var wordItem in config.Words)
+        foreach (var (word, scores) in config.Words)
         {
-            if (!words.Contains(wordItem.word)) continue;
+            if (!words.Contains(word)) continue;
 
-            var score = wordItem.scores.FirstOrDefault(s => s.userId == message.Author.Id);
+            var score = scores.FirstOrDefault(s => s.userId == message.Author.Id);
             if (score != (default, default))
             {
-                wordItem.scores.Remove(score);
+                scores.Remove(score);
             }
             else
             {
@@ -36,13 +35,13 @@ public class MessageEvent(DiscordSocketClient client, ConfigService configServic
             }
 
             score.count++;
-            wordItem.scores.Add(score);
+            scores.Add(score);
             scoresUpdated = true;
 
-            var total = wordItem.scores.Sum(x => x.count);
+            var total = scores.Sum(x => x.count);
             if (total % 10 == 0)
             {
-                await message.Channel.SendMessageAsync($"`{wordItem.word}` has been said `{total}` times, congrats {message.Author.Mention}");
+                await message.Channel.SendMessageAsync($"`{word}` has been said `{total}` times, congrats {message.Author.Mention}");
             }
         }
 
@@ -82,23 +81,21 @@ public class MessageEvent(DiscordSocketClient client, ConfigService configServic
         var channel = await cachedChannel.GetOrDownloadAsync();
         if (channel is not IGuildChannel guildChannel) return;
         if (channel is not ISocketMessageChannel socketMessageChannel) return;
+        if (!deleted.HasValue) return;
+        if (deleted.Value.Author.IsBot || deleted.Value.Author.IsWebhook) return;
 
-        if (deleted.HasValue)
-        {
-            if (deleted.Value.Author.IsBot || deleted.Value.Author.IsWebhook) return;
-            var embed = new EmbedBuilder()
-                .AddField("Deleted", deleted.Value.Timestamp.DateTime.ToString("G"))
-               .AddField("Author", deleted.Value.Author.ToString())
-               .AddField("Channel", channel.Name, true)
-               .AddField("Message", deleted.Value.Content.Length > 1024 ? "This message is too long" : deleted.Value.Content)
-               .WithTitle("Message deleted")
-               .WithColor(Color.DarkRed)
-               .WithFooter(footer => footer.Text = "Created by the almighty ginger")
-               .WithAuthor(_client.CurrentUser)
-               .WithCurrentTimestamp();
+        var embed = new EmbedBuilder()
+            .AddField("Deleted", deleted.Value.Timestamp.DateTime.ToString("G"))
+            .AddField("Author", deleted.Value.Author.ToString())
+            .AddField("Channel", channel.Name, true)
+            .AddField("Message", deleted.Value.Content.Length > 1024 ? "This message is too long" : deleted.Value.Content)
+            .WithTitle("Message deleted")
+            .WithColor(Color.DarkRed)
+            .WithFooter(footer => footer.Text = "Created by the almighty ginger")
+            .WithAuthor(_client.CurrentUser)
+            .WithCurrentTimestamp();
 
-            await SendLogEmbed(embed.Build(), socketMessageChannel, guildChannel);
-        }
+        await SendLogEmbed(embed.Build(), socketMessageChannel, guildChannel);
     }
 
     private async Task SendLogEmbed(Embed embed, ISocketMessageChannel channel, IGuildChannel guildChannel)

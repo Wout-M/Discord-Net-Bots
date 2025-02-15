@@ -60,9 +60,9 @@ public class AdminModule(ConfigService configService) : InteractionModuleBase<In
         embed.AddField("Mod channel", modChannelText);
 
         string logChannelText = noChannelText;
-        if (config.ModChannel.HasValue)
+        if (config.LogChannel.HasValue)
         {
-            var channel = await Context.Guild.GetTextChannelAsync(config.ModChannel.Value);
+            var channel = await Context.Guild.GetTextChannelAsync(config.LogChannel.Value);
             if (channel != null)
             {
                 logChannelText = $"{channel.Mention}";

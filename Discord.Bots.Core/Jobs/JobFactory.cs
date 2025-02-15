@@ -3,14 +3,9 @@ using Quartz.Spi;
 
 namespace Discord.Bots.Core.Jobs;
 
-public class JobFactory : IJobFactory
+public class JobFactory(IServiceProvider container) : IJobFactory
 {
-    protected readonly IServiceProvider Container;
-
-    public JobFactory(IServiceProvider container)
-    {
-        Container = container;
-    }
+    protected readonly IServiceProvider Container = container;
 
     public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
     {

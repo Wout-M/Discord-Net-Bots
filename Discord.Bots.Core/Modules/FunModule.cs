@@ -67,7 +67,6 @@ public class FunModule(IHttpClientFactory httpClientFactory) : InteractionModule
 
     #endregion
 
-
     #region Dice
 
     [SlashCommand("dice", "Roll a dice with <number> sides")]
