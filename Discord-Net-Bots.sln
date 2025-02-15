@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bots", "Bots", "{0DF043B6-2A85-431C-8520-F48E909DEAB2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Bots.KGB", "Discord.Bots.KGB\Discord.Bots.KGB.csproj", "{9EAE8913-F82D-4E6F-ADD7-93B2D2843B5C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Bots.ExWi", "Discord.Bots.ExWi\Discord.Bots.ExWi.csproj", "{2813361A-86B8-4726-9C22-04D7B14263AA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Bots.Test", "Discord.Bots.Test\Discord.Bots.Test.csproj", "{D1E4F323-C3FF-42EB-99C7-0042CCA6D455}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Bots.The_Wanderers_Helper", "Discord.Bots.The_Wanderers_Helper\Discord.Bots.The_Wanderers_Helper.csproj", "{0417C1E3-3326-4D5B-9FCB-0DFD6C225641}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Bots.Core", "Discord.Bots.Core\Discord.Bots.Core.csproj", "{EB537F37-EC92-4670-9EC3-4A2954536074}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9EAE8913-F82D-4E6F-ADD7-93B2D2843B5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EAE8913-F82D-4E6F-ADD7-93B2D2843B5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EAE8913-F82D-4E6F-ADD7-93B2D2843B5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EAE8913-F82D-4E6F-ADD7-93B2D2843B5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2813361A-86B8-4726-9C22-04D7B14263AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2813361A-86B8-4726-9C22-04D7B14263AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2813361A-86B8-4726-9C22-04D7B14263AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2813361A-86B8-4726-9C22-04D7B14263AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1E4F323-C3FF-42EB-99C7-0042CCA6D455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1E4F323-C3FF-42EB-99C7-0042CCA6D455}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1E4F323-C3FF-42EB-99C7-0042CCA6D455}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1E4F323-C3FF-42EB-99C7-0042CCA6D455}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0417C1E3-3326-4D5B-9FCB-0DFD6C225641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0417C1E3-3326-4D5B-9FCB-0DFD6C225641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0417C1E3-3326-4D5B-9FCB-0DFD6C225641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0417C1E3-3326-4D5B-9FCB-0DFD6C225641}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB537F37-EC92-4670-9EC3-4A2954536074}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB537F37-EC92-4670-9EC3-4A2954536074}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB537F37-EC92-4670-9EC3-4A2954536074}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB537F37-EC92-4670-9EC3-4A2954536074}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9EAE8913-F82D-4E6F-ADD7-93B2D2843B5C} = {0DF043B6-2A85-431C-8520-F48E909DEAB2}
+		{2813361A-86B8-4726-9C22-04D7B14263AA} = {0DF043B6-2A85-431C-8520-F48E909DEAB2}
+		{D1E4F323-C3FF-42EB-99C7-0042CCA6D455} = {0DF043B6-2A85-431C-8520-F48E909DEAB2}
+		{0417C1E3-3326-4D5B-9FCB-0DFD6C225641} = {0DF043B6-2A85-431C-8520-F48E909DEAB2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {45E5930E-A579-4B83-9951-AB5513597DEC}
+	EndGlobalSection
+EndGlobal

@@ -5,7 +5,8 @@ on:
     branches: 
       - 'main'
     paths:
-      - 'KGB/**'
+      - 'Discord.Bots.KGB/**'
+      - 'Discord.Bots.Core/**'
 
 jobs:
   build:
@@ -16,19 +17,19 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.0.x
 
     - name: Restore dependencies
-      run: dotnet restore "./KGB"
+      run: dotnet restore "./Discord.Bots.KGB"
 
     - name: Build
-      run: dotnet build "./KGB" --configuration Release --no-restore
+      run: dotnet build "./Discord.Bots.KGB" --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test "./KGB" --no-restore --verbosity normal
+      run: dotnet test "./Discord.Bots.KGB" --no-restore --verbosity normal
 
     - name: Publish
-      run: dotnet publish "./KGB" -c Release -o release
+      run: dotnet publish "./Discord.Bots.KGB" -c Release -o release
 
     - name: Commit to KGB
       uses: JamesIves/github-pages-deploy-action@3.7.1

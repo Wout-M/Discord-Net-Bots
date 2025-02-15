@@ -5,7 +5,8 @@ on:
     branches: 
       - 'main'
     paths:
-      - 'The_Wanderers_Helper/**'
+      - 'Discord.Bots.The_Wanderers_Helper/**'
+      - 'Discord.Bots.Core/**'
 
 jobs:
   build:
@@ -16,19 +17,19 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.0.x
 
     - name: Restore dependencies
-      run: dotnet restore "./The_Wanderers_Helper"
+      run: dotnet restore "./Discord.Bots.The_Wanderers_Helper"
 
     - name: Build
-      run: dotnet build "./The_Wanderers_Helper" --configuration Release --no-restore
+      run: dotnet build "./Discord.Bots.The_Wanderers_Helper" --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test "./The_Wanderers_Helper" --no-restore --verbosity normal
+      run: dotnet test "./Discord.Bots.The_Wanderers_Helper" --no-restore --verbosity normal
 
     - name: Publish
-      run: dotnet publish "./The_Wanderers_Helper" -c Release -o release
+      run: dotnet publish "./Discord.Bots.The_Wanderers_Helper" -c Release -o release
 
     - name: Commit to Wanderer
       uses: JamesIves/github-pages-deploy-action@3.7.1
