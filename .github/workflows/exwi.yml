@@ -5,7 +5,8 @@ on:
     branches: 
       - 'main'
     paths:
-      - 'ExWi/**'
+      - 'Discord.Bots.ExWi/**'
+      - 'Discord.Bots.Core/**'
 
 jobs:
   build:
@@ -16,19 +17,19 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.0.x
 
     - name: Restore dependencies
-      run: dotnet restore "./ExWi"
+      run: dotnet restore "./Discord.Bots.ExWi"
 
     - name: Build
-      run: dotnet build "./ExWi" --configuration Release --no-restore
+      run: dotnet build "./Discord.Bots.ExWi" --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test "./ExWi" --no-restore --verbosity normal
+      run: dotnet test "./Discord.Bots.ExWi" --no-restore --verbosity normal
 
     - name: Publish
-      run: dotnet publish "./ExWi" -c Release -o release
+      run: dotnet publish "./Discord.Bots.ExWi" -c Release -o release
 
     - name: Commit to ExWi
       uses: JamesIves/github-pages-deploy-action@3.7.1
